@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export function Login() {
+    const navigate = useNavigate();
+
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -27,6 +29,7 @@ export function Login() {
         const data = await response.json();
         if (data.success) {
             setMessage("Login Successful");
+            navigate('/Home');
         } else {
             setMessage("Invalid Username or Password");
         }

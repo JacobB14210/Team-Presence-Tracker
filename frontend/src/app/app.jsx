@@ -1,8 +1,12 @@
-import { Login } from '../components/component-index';
+import { Routes, Route } from "react-router-dom";
+import { Login, Home } from '../components/component-index';
 
 function App() {
     return (
-        <Login />
+        <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/Home" element={<Home />} />
+        </Routes>
     );
 }
 
