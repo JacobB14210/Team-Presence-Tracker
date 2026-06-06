@@ -92,6 +92,7 @@ app.post("/login", (req, res) => {
         }
 
         const user = results[0];
+        
         // TODO: Hash password
         if (user.pass_hash === password) {
             return res.json({
