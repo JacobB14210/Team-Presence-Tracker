@@ -1,10 +1,10 @@
 import { Dashboard } from "../component-index";
 
-export function Home() {
+export function Calendar() {
     return (
         <div>
             <Dashboard />
-            Home Page
+            Calendar Page
         </div>
     );
 }

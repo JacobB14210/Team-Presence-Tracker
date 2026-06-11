@@ -1,10 +1,10 @@
 import { Dashboard } from "../component-index";
 
-export function Home() {
+export function Time() {
     return (
         <div>
             <Dashboard />
-            Home Page
+            Time Off Request Page
         </div>
     );
 }
