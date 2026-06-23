@@ -29,7 +29,8 @@ export function Login() {
         const data = await response.json();
         if (data.success) {
             setMessage("Login Successful");
-            navigate('/Home');
+            // Navigate to calendar path
+            navigate('/Calendar');
         } else {
             setMessage("Invalid Username or Password");
         }

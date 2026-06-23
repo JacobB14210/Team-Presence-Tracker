@@ -8,13 +8,6 @@ export function Dashboard() {
         <div>
             <button
                 type="button"
-                onClick={() => navigate("/Home")}
-            >
-                Home
-            </button>
-
-            <button
-                type="button"
                 onClick={() => navigate("/Time-Off")}
             >
                 Time Off
