@@ -32,54 +32,6 @@ db.connect((err) => { // Checks for connection fail
     console.log("Connected to Database");
 });
 
-// Get user from username call
-app.get("/username", (req, res) => {
-    const username = req.query.username;
-    const sql =
-        "SELECT * FROM users WHERE username = ?";
-
-    db.query(sql, [username], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({
-                error: "Database Error"
-            });
-        }
-
-        if (result.length === 0) {
-            return res.status(404).json({
-                error: "User not found"
-            });
-        }
-
-        res.json(result[0]);
-    });
-});
-
-// Get user from email call
-app.get("/email", (req, res) => {
-    const email = req.query.email;
-    const sql = 
-        "SELECT * FROM users WHERE email = ?";
-
-    db.query(sql, [email], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({
-                error: "Database Error"
-            });
-        }
-
-        if (result.length === 0) {
-            return res.status(404).json({
-                error: "User not found"
-            });
-        }
-        
-        res.json(result[0]);
-    });
-});
-
 // Post login from login page
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
@@ -120,7 +72,6 @@ app.post("/google-login", async (req, res) => {
     const { token } = req.body;
 
     try {
-
         const ticket =
             await client.verifyIdToken({
                 idToken: token,
@@ -143,7 +94,6 @@ app.post("/google-login", async (req, res) => {
         });
 
     } catch (err) {
-
         console.error(err);
 
         res.status(401).json({
