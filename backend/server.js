@@ -104,6 +104,7 @@ app.post("/create", (req, res) => {
     });
 });
 
+// Post for google login
 app.post("/google-login", async (req, res) => {
 
     const { token } = req.body;
@@ -121,16 +122,29 @@ app.post("/google-login", async (req, res) => {
         const email =
             payload.email;
 
-        const name =
-            payload.name;
+        const sql =
+            "SELECT * FROM users WHERE email = ?";
 
-        res.json({
-            success: true,
-            email,
-            name
+        db.query(sql, [email], (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false
+                });
+            }
+
+            if (results.length === 0) {
+                return res.json({
+                    success: false
+                });
+            }
+
+            return res.json({
+                success: true
+            });
         });
 
-    } catch (err) {
+    }
+    catch (err) {
         console.error(err);
 
         res.status(401).json({

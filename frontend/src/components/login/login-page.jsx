@@ -62,7 +62,7 @@ export function Login() {
             // Navigate to calendar path
             navigate('/Calendar');
         } else {
-            setMessage("Invalid Email or Password");
+            setMessage("Account does not exist for that email");
         }
     };
 

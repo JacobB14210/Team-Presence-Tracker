@@ -7,7 +7,7 @@ export function Create() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emp_type, setEmp_Type] = useState("");
-    const [message, setMessage] = useState("Intern");
+    const [message, setMessage] = useState("");
 
     const handleCreateAccount = async (e) => {
         e.preventDefault();
