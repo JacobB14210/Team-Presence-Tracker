@@ -34,12 +34,12 @@ db.connect((err) => { // Checks for connection fail
 
 // Post login from login page
 app.post("/login", (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     const sql =
-        "SELECT * FROM users WHERE username = ?";
+        "SELECT * FROM users WHERE email = ?";
 
-    db.query(sql, [username], (err, results) => {
+    db.query(sql, [email], (err, results) => {
         if (err) {
             return res.status(500).json({
                 success: false
@@ -64,6 +64,43 @@ app.post("/login", (req, res) => {
         res.json({
             success: false
         });
+    });
+});
+
+// Post create from create account page
+app.post("/create", (req, res) => {
+    const { email, password, emp_type } = req.body;
+
+    // Check if email already exists
+    const sql =
+        "SELECT * FROM users WHERE email = ?";
+
+    db.query(sql, [email], (err, results) => {
+        if (err) {
+            return res.status(500).json({
+                success: false
+            });
+        }
+
+        if (results.length > 0) {
+            return res.json({
+                success: false
+            });
+        }
+
+        const insertSQL =
+            "INSERT INTO users (email,pass_hash,emp_type) VALUES (?, ?, ?)";
+        
+        db.query(insertSQL, [email, password, emp_type], (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false
+                });
+            }
+            res.json({
+                success: true
+            });
+        })
     });
 });
 

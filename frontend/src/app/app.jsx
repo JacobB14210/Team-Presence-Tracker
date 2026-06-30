@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { Login, Time, Calendar } from '../components/component-index';
+import { Login, Time, Calendar, Create} from '../components/component-index';
 
 function App() {
     return (
@@ -8,6 +8,7 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/Time-Off" element={<Time />} />
             <Route path="/Calendar" element={<Calendar />} />
+            <Route path="/Create" element={<Create />} />
         </Routes>
     );
 }

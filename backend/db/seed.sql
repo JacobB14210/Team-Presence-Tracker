@@ -1,5 +1,12 @@
 
-INSERT INTO users(username,pass_hash,email,emp_type)
+INSERT INTO users(email,pass_hash,emp_type)
 VALUES
-('Jacob','1,','jacob@email.com','intern'),
-('Alice','2','alice@email.com','full');
+('jacob@email.com','1','intern'),
+('alice@email.com','2','full')
+
+INSERT INTO users(email,pass_hash,emp_type)
+VALUES
+('jacob@email.com','1','intern')
+
+SELECT email from users
+where email = 'angelica@gmail.com'

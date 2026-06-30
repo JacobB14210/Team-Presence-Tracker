@@ -6,7 +6,7 @@ import { GoogleLogin } from "@react-oauth/google"
 export function Login() {
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
 
@@ -21,7 +21,7 @@ export function Login() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    username,
+                    email,
                     password
                 })
             }
@@ -33,8 +33,9 @@ export function Login() {
             setMessage("Login Successful");
             // Navigate to calendar path
             navigate('/Calendar');
-        } else {
-            setMessage("Invalid Username or Password");
+        }
+        else {
+            setMessage("Invalid Email or Password");
         }
     };
     
@@ -61,14 +62,12 @@ export function Login() {
             // Navigate to calendar path
             navigate('/Calendar');
         } else {
-            setMessage("Invalid Username or Password");
+            setMessage("Invalid Email or Password");
         }
     };
-    
+
 
     return (
-
-        
         <div>
             <h1>Login</h1>
 
@@ -76,10 +75,10 @@ export function Login() {
 
                 <input
                     type="text"
-                    placeholder="Username"
-                    value={username}
+                    placeholder="Email"
+                    value={email}
                     onChange={(e) =>
-                        setUsername(e.target.value)
+                        setEmail(e.target.value)
                     }
                 />
 
@@ -101,6 +100,14 @@ export function Login() {
                 </button>
 
             </form>
+
+            <br />
+
+            <button onClick={() => navigate("/Create")}>
+                Create Account
+            </button>
+
+            <br /><br />
             
             <GoogleLogin
                 onSuccess={handleGoogleSuccess}
