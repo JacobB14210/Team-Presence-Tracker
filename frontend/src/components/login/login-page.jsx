@@ -78,8 +78,7 @@ export function Login() {
                     placeholder="Email"
                     value={email}
                     onChange={(e) =>
-                        setEmail(e.target.value)
-                    }
+                        setEmail(e.target.value)}
                 />
 
                 <br /><br />
@@ -89,8 +88,7 @@ export function Login() {
                     placeholder="Password"
                     value={password}
                     onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
+                        setPassword(e.target.value)}
                 />
 
                 <br /><br />
