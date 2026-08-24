@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Dashboard } from "../component-index";
 
 export function Time() {
-    const [start_datetime, setStart] = useState("");
-    const [end_datetime, setEnd] = useState("");
+    const [startDate, setStart] = useState("");
+    const [endDate, setEnd] = useState("");
     const [reason, setReason] = useState("");
 
     const [leaveEarly, setLeaveEarly] = useState(false);
@@ -13,11 +13,38 @@ export function Time() {
 
     const handleRequestOff = async (e) => {
         e.preventDefault();
-        console.log(start_datetime);
-        console.log(end_datetime);
+        console.log(startDate);
+        console.log(endDate);
         console.log(reason);
         console.log(leaveTime);
         console.log(returnTime);
+
+        const response = await fetch(
+            "http://localhost:5000/request-off", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    startDate,
+                    endDate,
+                    reason,
+                    leaveEarly,
+                    returnLate,
+                    leaveTime,
+                    returnTime
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert("Time off request submitted!");
+        }
+        else {
+            alert(data.message);
+        }
     };
     return (
         <div>
@@ -28,7 +55,7 @@ export function Time() {
                 <label>Start Date: </label>
                 <input
                     type="date"
-                    value={start_datetime}
+                    value={startDate}
                     onChange={(e) =>
                         setStart(e.target.value)}/>
                 
@@ -37,7 +64,7 @@ export function Time() {
                 <label>End Date: </label>
                 <input
                     type="date"
-                    value={end_datetime}
+                    value={endDate}
                     onChange={(e) =>
                         setEnd(e.target.value)}/>
 

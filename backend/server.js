@@ -104,6 +104,33 @@ app.post("/create", (req, res) => {
     });
 });
 
+app.post("/request-off", async (req, res) => {
+    const { startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
+
+    const insertSQL = `INSERT INTO time_off
+        (start_date, end_date, reason, leave_early, return_late, leave_time, return_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+    db.query(insertSQL, [startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
+        (err, results) => {
+
+            if (err) {
+                console.error("Error creating time off request:", err);
+
+                return res.status(500).json({
+                    success: false,
+                    message: "Failed to create time off request"
+                });
+            }
+
+            res.json({
+                success: true,
+                message: "Time off request submitted"
+            });
+        }
+    );
+})
+
 // Post for google login
 app.post("/google-login", async (req, res) => {
 
