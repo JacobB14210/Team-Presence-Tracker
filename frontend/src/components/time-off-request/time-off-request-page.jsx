@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Dashboard } from "../component-index";
 
 export function Time() {
+    const [message, setMessage] = useState("")
+
     const [startDate, setStart] = useState("");
     const [endDate, setEnd] = useState("");
     const [reason, setReason] = useState("");
@@ -13,11 +15,30 @@ export function Time() {
 
     const handleRequestOff = async (e) => {
         e.preventDefault();
-        console.log(startDate);
-        console.log(endDate);
-        console.log(reason);
-        console.log(leaveTime);
-        console.log(returnTime);
+
+        if (startDate == "" || endDate == "") {
+            setMessage("Select a start date and end date");
+            return;
+        }
+
+        if (reason == "") {
+            setMessage("Select a reason for time off request");
+            return;
+        }
+
+        if (leaveEarly == true) {
+            if (leaveTime == "") {
+                setMessage("Select the time you want to leave early");
+                return;
+            }
+        }
+
+        if (returnLate == true) {
+            if (returnTime == "") {
+                setMessage("Select the time you want to return late");
+                return;
+            }
+        }
 
         const response = await fetch(
             "http://localhost:5000/request-off", {
@@ -40,12 +61,27 @@ export function Time() {
         const data = await response.json();
 
         if (data.success) {
-            alert("Time off request submitted!");
+            setMessage("Time off request submitted");
         }
         else {
-            alert(data.message);
+            setMessage("Error submitting time off request");
         }
+
+        
+        setStart("");
+        setEnd("");
+        setReason("");
+
+        setLeaveEarly(false);
+        setReturnLate(false);
+        setLeaveTime("");
+        setReturnTime("");
     };
+
+    const handleFormReset = async (e) => {
+        e.preventDefault();
+    }
+
     return (
         <div>
             <Dashboard />
@@ -118,6 +154,8 @@ export function Time() {
                     Submit Time Off Request
                 </button>
             </form>
+
+            <p>{message}</p>
         </div>
     );
 }
