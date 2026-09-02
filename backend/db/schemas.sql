@@ -12,11 +12,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS time_off (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     reason VARCHAR(50) NOT NULL,
     leave_early BOOLEAN DEFAULT FALSE,
     return_late BOOLEAN DEFAULT FALSE,
     leave_time TIME NULL,
-    return_time TIME NULL
-)
+    return_time TIME NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);

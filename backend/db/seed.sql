@@ -11,4 +11,6 @@ VALUES
 SELECT email from users
 where email = 'angelica@gmail.com'
 
-DROp TABLE users
+DROP TABLE users
+
+DROP TABLE time_off
