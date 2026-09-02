@@ -5,6 +5,7 @@ export function Create() {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     const [emp_type, setEmp_Type] = useState("");
     const [message, setMessage] = useState("");
@@ -12,7 +13,7 @@ export function Create() {
     const handleCreateAccount = async (e) => {
         e.preventDefault();
 
-        if (!email || !password) {
+        if (!email || !password || !name) {
             setMessage("Please fill out all fields.");
             return;
         }
@@ -26,6 +27,7 @@ export function Create() {
                 },
                 body: JSON.stringify({
                     email,
+                    name,
                     password,
                     emp_type
                 })
@@ -49,12 +51,22 @@ export function Create() {
 
             <form onSubmit={handleCreateAccount}>
                 <input
+                    type="name"
+                    placeholder="Name"
+                    value={name}
+                    onChange={(e) =>
+                        setName(e.target.value)
+                    }
+                />
+
+                <br /><br />
+
+                <input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) =>
-                        setEmail(e.target.value)
-                    }
+                        setEmail(e.target.value)}
                 />
 
                 <br /><br />
@@ -70,7 +82,7 @@ export function Create() {
 
                 <br /><br />
 
-                <label htmlfor="emp_type">Choose Employee Type:</label>
+                <label htmlfor="emp_type">Choose Employee Type: </label>
                 <select
                     name="emp_type"
                     id="emp_type"

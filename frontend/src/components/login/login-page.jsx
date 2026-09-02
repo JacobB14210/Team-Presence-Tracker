@@ -30,13 +30,17 @@ export function Login() {
         const data = await response.json();
 
         if (data.success) {
-            setMessage("Login Successful");
+            localStorage.setItem("name", JSON.stringify(data.name));
+            localStorage.setItem("email", JSON.stringify(data.email));
             // Navigate to calendar path
             navigate('/Calendar');
         }
         else {
             setMessage("Invalid Email or Password");
         }
+
+        console.log(localStorage.getItem("name"));
+        console.log(localStorage.getItem("email"));
     };
     
     const handleGoogleSuccess = async (credentialResponse) => {
@@ -58,12 +62,16 @@ export function Login() {
         console.log(data);
 
         if (data.success) {
-            setMessage("Login Successful");
+            localStorage.setItem("name", JSON.stringify(data.name));
+            localStorage.setItem("email", JSON.stringify(data.email));
             // Navigate to calendar path
             navigate('/Calendar');
         } else {
             setMessage("Account does not exist for that email");
         }
+
+        console.log(localStorage.getItem("name"));
+        console.log(localStorage.getItem("email"));
     };
 
 
@@ -74,7 +82,7 @@ export function Login() {
             <form onSubmit={handleLogin}>
 
                 <input
-                    type="text"
+                    type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) =>

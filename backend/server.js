@@ -53,11 +53,16 @@ app.post("/login", (req, res) => {
         }
 
         const user = results[0];
+
+        console.log(user.name);
+        console.log(user.email);
         
         // TODO: Hash password
         if (user.pass_hash === password) {
             return res.json({
-                success: true
+                success: true,
+                name: user.name,
+                email: user.email
             });
         }
 
@@ -67,9 +72,62 @@ app.post("/login", (req, res) => {
     });
 });
 
+// Post for google login
+app.post("/google-login", async (req, res) => {
+
+    const { token } = req.body;
+
+    try {
+        const ticket =
+            await client.verifyIdToken({
+                idToken: token,
+                audience: CLIENT_ID,
+            });
+
+        const payload =
+            ticket.getPayload();
+
+        const email =
+            payload.email;
+
+        const sql =
+            "SELECT * FROM users WHERE email = ?";
+
+        db.query(sql, [email], (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false
+                });
+            }
+
+            if (results.length === 0) {
+                return res.json({
+                    success: false
+                });
+            }
+
+            const user = results[0];
+
+            return res.json({
+                success: true,
+                name: user.name,
+                email: user.email
+            });
+        });
+
+    }
+    catch (err) {
+        console.error(err);
+
+        res.status(401).json({
+            success: false
+        });
+    }
+});
+
 // Post create from create account page
 app.post("/create", (req, res) => {
-    const { email, password, emp_type } = req.body;
+    const { email, name, password, emp_type } = req.body;
 
     // Check if email already exists
     const sql =
@@ -89,9 +147,9 @@ app.post("/create", (req, res) => {
         }
 
         const insertSQL =
-            "INSERT INTO users (email,pass_hash,emp_type) VALUES (?, ?, ?)";
+            "INSERT INTO users (email,name,pass_hash,emp_type) VALUES (?, ?, ?, ?)";
         
-        db.query(insertSQL, [email, password, emp_type], (err, results) => {
+        db.query(insertSQL, [email, name, password, emp_type], (err, results) => {
             if (err) {
                 return res.status(500).json({
                     success: false
@@ -130,55 +188,6 @@ app.post("/request-off", async (req, res) => {
         }
     );
 })
-
-// Post for google login
-app.post("/google-login", async (req, res) => {
-
-    const { token } = req.body;
-
-    try {
-        const ticket =
-            await client.verifyIdToken({
-                idToken: token,
-                audience: CLIENT_ID,
-            });
-
-        const payload =
-            ticket.getPayload();
-
-        const email =
-            payload.email;
-
-        const sql =
-            "SELECT * FROM users WHERE email = ?";
-
-        db.query(sql, [email], (err, results) => {
-            if (err) {
-                return res.status(500).json({
-                    success: false
-                });
-            }
-
-            if (results.length === 0) {
-                return res.json({
-                    success: false
-                });
-            }
-
-            return res.json({
-                success: true
-            });
-        });
-
-    }
-    catch (err) {
-        console.error(err);
-
-        res.status(401).json({
-            success: false
-        });
-    }
-});
 
 app.listen(5000, () => {
     console.log("Server running on port 5000");

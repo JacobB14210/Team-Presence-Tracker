@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100),
+    name VARCHAR(100),
     pass_hash VARCHAR(100),
     emp_type VARCHAR(100),
     sick INT DEFAULT 0,
