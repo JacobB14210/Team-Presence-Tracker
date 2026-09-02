@@ -53,14 +53,12 @@ app.post("/login", (req, res) => {
         }
 
         const user = results[0];
-
-        console.log(user.name);
-        console.log(user.email);
         
         // TODO: Hash password
         if (user.pass_hash === password) {
             return res.json({
                 success: true,
+                id: user.id,
                 name: user.name,
                 email: user.email
             });
@@ -74,7 +72,6 @@ app.post("/login", (req, res) => {
 
 // Post for google login
 app.post("/google-login", async (req, res) => {
-
     const { token } = req.body;
 
     try {
@@ -110,6 +107,7 @@ app.post("/google-login", async (req, res) => {
 
             return res.json({
                 success: true,
+                id: user.id,
                 name: user.name,
                 email: user.email
             });
@@ -163,13 +161,13 @@ app.post("/create", (req, res) => {
 });
 
 app.post("/request-off", async (req, res) => {
-    const { startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
+    const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
 
-    const insertSQL = `INSERT INTO time_off
-        (start_date, end_date, reason, leave_early, return_late, leave_time, return_time)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const insertSQL = `INSERT INTO time_off 
+        (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    db.query(insertSQL, [startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
+    db.query(insertSQL, [userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
         (err, results) => {
 
             if (err) {

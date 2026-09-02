@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dashboard } from "../component-index";
 
 export function Time() {
-    const [message, setMessage] = useState("")
+    const [message, setMessage] = useState("");
 
     const [startDate, setStart] = useState("");
     const [endDate, setEnd] = useState("");
@@ -40,6 +40,11 @@ export function Time() {
             }
         }
 
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        console.log(user);
+        const userID = user.id;
+        console.log(userID);
+
         const response = await fetch(
             "http://localhost:5000/request-off", {
                 method: "POST",
@@ -47,6 +52,7 @@ export function Time() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
+                    userID,
                     startDate,
                     endDate,
                     reason,
@@ -64,7 +70,7 @@ export function Time() {
             setMessage("Time off request submitted");
         }
         else {
-            setMessage("Error submitting time off request");
+            setMessage(data.message);
         }
 
         
@@ -77,10 +83,6 @@ export function Time() {
         setLeaveTime("");
         setReturnTime("");
     };
-
-    const handleFormReset = async (e) => {
-        e.preventDefault();
-    }
 
     return (
         <div>
