@@ -35,9 +35,8 @@ export function Login() {
                 name: data.name,
                 email: data.email
             };
-            localStorage.setItem("currentUser", JSON.stringify(user));
 
-            console.log(localStorage.getItem("currentUser"));
+            localStorage.setItem("currentUser", JSON.stringify(user));
             
             // Navigate to calendar path
             navigate('/Calendar');
@@ -69,13 +68,13 @@ export function Login() {
                 name: data.name,
                 email: data.email
             };
+
             localStorage.setItem("currentUser", JSON.stringify(user));
 
-            console.log(localStorage.getItem("currentUser"));
-            
             // Navigate to calendar path
             navigate('/Calendar');
-        } else {
+        }
+        else {
             setMessage("Account does not exist for that email");
         }
     };
@@ -124,7 +123,7 @@ export function Login() {
             <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={() => {
-                    console.log("Login Failed");
+                    setMessage("Login Failed")
                 }}
             />
 

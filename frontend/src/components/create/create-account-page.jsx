@@ -37,12 +37,12 @@ export function Create() {
         const data = await response.json();
 
         if (data.success) {
-            // Navigate back to login path
-            navigate('/');
+            setEmail("");
+            setName("");
+            setPassword("");
         }
-        else {
-            setMessage("Unable to create account");
-        }
+        
+        setMessage(data.message);
     };
 
     return (

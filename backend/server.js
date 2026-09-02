@@ -36,19 +36,20 @@ db.connect((err) => { // Checks for connection fail
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
-    const sql =
+    const getEmailSQL =
         "SELECT * FROM users WHERE email = ?";
 
-    db.query(sql, [email], (err, results) => {
+    db.query(getEmailSQL, [email], (err, results) => {
         if (err) {
             return res.status(500).json({
                 success: false
             });
         }
 
-        if (results.length === 0) {
+        if (results.length === 0) { // Check if user exists in database
             return res.json({
-                success: false
+                success: false,
+                message: "User does not exist"
             });
         }
 
@@ -87,19 +88,20 @@ app.post("/google-login", async (req, res) => {
         const email =
             payload.email;
 
-        const sql =
+        const getEmailSQL =
             "SELECT * FROM users WHERE email = ?";
 
-        db.query(sql, [email], (err, results) => {
+        db.query(getEmailSQL, [email], (err, results) => {
             if (err) {
                 return res.status(500).json({
                     success: false
                 });
             }
 
-            if (results.length === 0) {
+            if (results.length === 0) { // Check if user exists in database
                 return res.json({
-                    success: false
+                    success: false,
+                    message: "User does not exist"
                 });
             }
 
@@ -112,7 +114,6 @@ app.post("/google-login", async (req, res) => {
                 email: user.email
             });
         });
-
     }
     catch (err) {
         console.error(err);
@@ -128,10 +129,10 @@ app.post("/create", (req, res) => {
     const { email, name, password, emp_type } = req.body;
 
     // Check if email already exists
-    const sql =
+    const getEmailSQL =
         "SELECT * FROM users WHERE email = ?";
 
-    db.query(sql, [email], (err, results) => {
+    db.query(getEmailSQL, [email], (err, results) => {
         if (err) {
             return res.status(500).json({
                 success: false
@@ -140,21 +141,24 @@ app.post("/create", (req, res) => {
 
         if (results.length > 0) {
             return res.json({
-                success: false
+                success: false,
+                message: "Email is already used"
             });
         }
 
-        const insertSQL =
+        const insertUserSQL =
             "INSERT INTO users (email,name,pass_hash,emp_type) VALUES (?, ?, ?, ?)";
         
-        db.query(insertSQL, [email, name, password, emp_type], (err, results) => {
+        db.query(insertUserSQL, [email, name, password, emp_type], (err, results) => {
             if (err) {
                 return res.status(500).json({
-                    success: false
+                    success: false,
+                    message: "Error creating account"
                 });
             }
             res.json({
-                success: true
+                success: true,
+                message: "Successfully created account"
             });
         })
     });
@@ -163,13 +167,12 @@ app.post("/create", (req, res) => {
 app.post("/request-off", async (req, res) => {
     const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
 
-    const insertSQL = `INSERT INTO time_off 
+    const insertTimeSQL = `INSERT INTO time_off 
         (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    db.query(insertSQL, [userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
+    db.query(insertTimeSQL, [userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
         (err, results) => {
-
             if (err) {
                 console.error("Error creating time off request:", err);
 

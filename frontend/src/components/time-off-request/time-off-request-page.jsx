@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Dashboard } from "../component-index";
 
 export function Time() {
-    const [message, setMessage] = useState("");
-
     const [startDate, setStart] = useState("");
     const [endDate, setEnd] = useState("");
     const [reason, setReason] = useState("");
@@ -12,6 +10,8 @@ export function Time() {
     const [returnLate, setReturnLate] = useState(false);
     const [leaveTime, setLeaveTime] = useState("");
     const [returnTime, setReturnTime] = useState("");
+
+    const [message, setMessage] = useState("");
 
     const handleRequestOff = async (e) => {
         e.preventDefault();
@@ -41,9 +41,7 @@ export function Time() {
         }
 
         const user = JSON.parse(localStorage.getItem("currentUser"));
-        console.log(user);
         const userID = user.id;
-        console.log(userID);
 
         const response = await fetch(
             "http://localhost:5000/request-off", {
@@ -67,21 +65,18 @@ export function Time() {
         const data = await response.json();
 
         if (data.success) {
-            setMessage("Time off request submitted");
-        }
-        else {
             setMessage(data.message);
+            setStart("");
+            setEnd("");
+            setReason("");
+
+            setLeaveEarly(false);
+            setReturnLate(false);
+            setLeaveTime("");
+            setReturnTime("");
         }
 
-        
-        setStart("");
-        setEnd("");
-        setReason("");
-
-        setLeaveEarly(false);
-        setReturnLate(false);
-        setLeaveTime("");
-        setReturnTime("");
+        setMessage(data.message);
     };
 
     return (
