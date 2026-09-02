@@ -1,0 +1,68 @@
+.react-aria-Calendar {
+    width: 350px;
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+
+    font-family: Arial, sans-serif;
+}
+
+.react-aria-Calendar header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.react-aria-CalendarHeading {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.react-aria-CalendarGrid {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.react-aria-CalendarGrid th {
+    padding: 8px;
+}
+
+.react-aria-CalendarGrid td {
+    padding: 4px;
+}
+
+.react-aria-CalendarCell {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.react-aria-CalendarCell:hover {
+    background: #eee;
+}
+
+.react-aria-CalendarCell[data-selected] {
+    background: #2563eb;
+    color: white;
+}
+
+.react-aria-CalendarCell[data-today] {
+    border: 2px solid #2563eb;
+}
+
+.react-aria-CalendarCell[data-disabled] {
+    color: #aaa;
+    cursor: not-allowed;
+}
