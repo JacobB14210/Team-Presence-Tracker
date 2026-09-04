@@ -65,7 +65,7 @@ app.post("/login", (req, res) => {
             });
         }
 
-        res.json({
+        return res.json({
             success: false
         });
     });
@@ -118,13 +118,13 @@ app.post("/google-login", async (req, res) => {
     catch (err) {
         console.error(err);
 
-        res.status(401).json({
+        return res.status(401).json({
             success: false
         });
     }
 });
 
-// Post create from create account page
+// Post new account from create account page
 app.post("/create", (req, res) => {
     const { email, name, password, emp_type } = req.body;
 
@@ -156,7 +156,8 @@ app.post("/create", (req, res) => {
                     message: "Error creating account"
                 });
             }
-            res.json({
+
+            return res.json({
                 success: true,
                 message: "Successfully created account"
             });
@@ -164,8 +165,10 @@ app.post("/create", (req, res) => {
     });
 });
 
+// Post time off request from time off request page
 app.post("/request-off", async (req, res) => {
-    const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
+    const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime }
+        = req.body;
 
     const insertTimeSQL = `INSERT INTO time_off 
         (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time) 
@@ -182,12 +185,50 @@ app.post("/request-off", async (req, res) => {
                 });
             }
 
-            res.json({
+            return res.json({
                 success: true,
                 message: "Time off request submitted"
             });
         }
     );
+})
+
+// Get time off request for selected day
+app.get("/time-off", (req, res) => {
+    const { date } = req.query;
+
+    const getRequestCardSQL = `
+        SELECT
+            time_off.id,
+            time_off.user_id,
+            users.name,
+            time_off.start_date,
+            time_off.end_date,
+            time_off.reason,
+            time_off.leave_early,
+            time_off.return_late,
+            time_off.leave_time,
+            time_off.return_time
+        FROM time_off
+        JOIN users
+            ON time_off.user_id = users.id
+        WHERE ? BETWEEN time_off.start_date AND time_off.end_date`;
+
+    db.query(getRequestCardSQL, [date], (err, results) => {
+        if (err) {
+            console.error("Error creating time off request:", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to create time off request"
+            });
+        }
+
+        res.json({
+            success: true,
+            requests: results
+        });
+    })
 })
 
 app.listen(5000, () => {

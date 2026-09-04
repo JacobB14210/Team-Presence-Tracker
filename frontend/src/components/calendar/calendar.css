@@ -9,8 +9,6 @@
     background: white;
     border: 1px solid #ddd;
     border-radius: 12px;
-
-    font-family: Arial, sans-serif;
 }
 
 .react-aria-Calendar header {
@@ -65,4 +63,12 @@
 .react-aria-CalendarCell[data-disabled] {
     color: #aaa;
     cursor: not-allowed;
+}
+
+.Calendar-Information {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+
+    font-family: Arial, sans-serif;
 }
