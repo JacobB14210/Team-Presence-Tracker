@@ -76,7 +76,8 @@ export function Calendar() {
                                     </strong>{" "}
                                     {request.reason}
 
-                                    {request.leave_early ? (
+                                    {request.leave_early && 
+                                        new Date(request.start_date).toISOString().split("T")[0] === date.toString() ? (
                                         <p>
                                             Leaves early: {" "}
                                             {request.leave_time}
@@ -84,8 +85,9 @@ export function Calendar() {
                                     ) : (
                                         <p></p>
                                     )}
-                                    
-                                    {request.return_late ? (
+
+                                    {request.return_late && 
+                                        new Date(request.end_date).toISOString().split("T")[0] == date.toString() ? (
                                         <p>
                                             Returns late: {" "}
                                             {request.return_time}
@@ -94,15 +96,6 @@ export function Calendar() {
                                         <p></p>
                                     )}
                                 </p>
-
-                                {request.return_late ? (
-                                    <p>
-                                        Returns late: {" "}
-                                        {request.return_time}
-                                    </p>
-                                ) : (
-                                    <p></p>
-                                )}
                             </div>
                         ))
                     )}

@@ -224,6 +224,8 @@ app.get("/time-off", (req, res) => {
             });
         }
 
+        console.log(results)
+
         res.json({
             success: true,
             requests: results
