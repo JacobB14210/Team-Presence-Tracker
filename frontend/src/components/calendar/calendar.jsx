@@ -78,22 +78,26 @@ export function Calendar() {
 
                                     {request.leave_early && 
                                         new Date(request.start_date).toISOString().split("T")[0] === date.toString() ? (
-                                        <p>
-                                            Leaves early: {" "}
+                                        <span>
+                                            {" "}-- Leaves early: {" "}
                                             {request.leave_time}
-                                        </p>
+                                        </span>
                                     ) : (
-                                        <p></p>
+                                        <span>
+
+                                        </span>
                                     )}
 
                                     {request.return_late && 
                                         new Date(request.end_date).toISOString().split("T")[0] == date.toString() ? (
-                                        <p>
-                                            Returns late: {" "}
+                                        <span>
+                                            {" "}-- Returns late: {" "}
                                             {request.return_time}
-                                        </p>
-                                    ) : (
-                                        <p></p>
+                                        </span>
+                                    ): (
+                                        <span>
+
+                                        </span>
                                     )}
                                 </p>
                             </div>
