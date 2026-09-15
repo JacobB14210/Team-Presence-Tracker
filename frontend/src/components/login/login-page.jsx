@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { GoogleLogin } from "@react-oauth/google"
+import { GoogleLogin } from "@react-oauth/google";
+
+import "./login-page.css";
+import logo from "../../assets/ETSBackground-CB-BW.png";
 
 export function Login() {
     const navigate = useNavigate();
@@ -81,54 +84,47 @@ export function Login() {
 
 
     return (
-        <div>
+        <div className="login-container">
+            <img src={logo} alt="company-logo" />
+
             <h1>Login</h1>
 
-            <form onSubmit={handleLogin}>
+            <form onSubmit={handleLogin} className="login-form">
 
                 <input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) =>
-                        setEmail(e.target.value)}
-                />
-
-                <br /><br />
+                        setEmail(e.target.value)}/>
 
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) =>
-                        setPassword(e.target.value)}
-                />
+                        setPassword(e.target.value)}/>
 
-                <br /><br />
-
-                <button type="submit">
+                <button type="submit" className="login-button">
                     Login
                 </button>
 
             </form>
 
-            <br />
-
-            <button onClick={() => navigate("/Create")}>
-                Create Account
-            </button>
-
-            <br /><br />
-            
             <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={() => {
                     setMessage("Login Failed")
                 }}
-            />
+                theme="filled_blue"
+                size="large"
+                shape="pill"
+                width="300px"/>
 
+            <button onClick={() => navigate("/Create")} className="create-button">
+                Create Account
+            </button>
             <p>{message}</p>
-
         </div>
     );
 }
