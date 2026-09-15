@@ -31,6 +31,11 @@ input {
   padding: 10px;
 }
 
+input:focus {
+  border: 2px solid #10069F;
+  outline: none;
+}
+
 button {
   width: 300px;
   color: #000000;
