@@ -82,7 +82,7 @@ export function Time() {
     return (
         <div>
             <Dashboard />
-            <h1>Time Off Request Page</h1>
+            <h1>Time Off Request</h1>
 
             <form onSubmit={handleRequestOff}>
                 <label>Start Date: </label>

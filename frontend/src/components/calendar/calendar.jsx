@@ -39,72 +39,80 @@ export function Calendar() {
     return (
         <div>
             <Dashboard />
-            <h1>Calendar Page</h1>
-            <div className="Calendar-Information">
-                <AriaCalendar
-                    aria-label="Time Off Calendar"
-                    value={date}
-                    onChange={setDate}
-                >
-                    <header>
-                        <Button slot="previous">Previous</Button>
-                        <Button slot="next">Next</Button>
-                    </header>
-                    <Heading />
-                    <CalendarGrid>
-                        {(date) => (
-                            <CalendarCell date={date} />
-                        )}
-                    </CalendarGrid>
-                </AriaCalendar>
-                <div className="Time-Off-Requests">
-                    <h2>Time Off Requests</h2>
-                    <p>
-                        Selected Date: {date.toString()}
-                    </p>
+            <div className="calendar-container">
+                <h1>Calendar</h1>
 
-                    {requests == 0 ? (
+                <div className="calendar-information">
+                    <AriaCalendar
+                        aria-label="Time Off Calendar"
+                        value={date}
+                        onChange={setDate}>
+
+                        <header>
+                            <Button slot="previous">Previous</Button>
+                            <Button slot="next">Next</Button>
+                        </header>
+
+                        <Heading />
+
+                        <CalendarGrid>
+                            {(date) => (
+                                <CalendarCell date={date} />
+                            )}
+                        </CalendarGrid>
+
+                    </AriaCalendar>
+
+                    <div className="time-off-requests">
+                        <h2>Time Off Requests</h2>
                         <p>
-                            No time off requests for this day
+                            {date.toString()}
                         </p>
-                    ) : (
-                        requests.map((request) => (
-                            <div className="Request-Card" key={request.id}>
-                                <p>
-                                    <strong>
-                                        {request.name}:
-                                    </strong>{" "}
-                                    {request.reason}
 
-                                    {request.leave_early && 
-                                        new Date(request.start_date).toISOString().split("T")[0] === date.toString() ? (
-                                        <span>
-                                            {" "}-- Leaves early: {" "}
-                                            {request.leave_time}
-                                        </span>
-                                    ) : (
-                                        <span>
+                        {requests == 0 ? (
+                            <p>
+                                No time off requests for this day
+                            </p>
+                        ) : (
+                            requests.map((request) => (
+                                <div className="Request-Card" key={request.id}>
+                                    <p>
+                                        <strong>
+                                            {request.name}:
+                                        </strong>{" "}
+                                        {request.reason}
 
-                                        </span>
-                                    )}
+                                        {request.leave_early && 
+                                            new Date(request.start_date).toISOString().split("T")[0] === date.toString() ? (
+                                            <span>
+                                                {" "}-- Leaves early: {" "}
+                                                {request.leave_time}
+                                            </span>
+                                        ) : (
+                                            <span>
 
-                                    {request.return_late && 
-                                        new Date(request.end_date).toISOString().split("T")[0] == date.toString() ? (
-                                        <span>
-                                            {" "}-- Returns late: {" "}
-                                            {request.return_time}
-                                        </span>
-                                    ): (
-                                        <span>
+                                            </span>
+                                        )}
 
-                                        </span>
-                                    )}
-                                </p>
-                            </div>
-                        ))
-                    )}
+                                        {request.return_late && 
+                                            new Date(request.end_date).toISOString().split("T")[0] == date.toString() ? (
+                                            <span>
+                                                {" "}-- Returns late: {" "}
+                                                {request.return_time}
+                                            </span>
+                                        ): (
+                                            <span>
+
+                                            </span>
+                                        )}
+                                    </p>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
+            
         </div>
     );
 }

@@ -10,7 +10,7 @@ export function Dashboard() {
                 type="button"
                 onClick={() => navigate("/Time-Off")}
             >
-                Time Off
+                Time Off Request
             </button>
 
             <button
