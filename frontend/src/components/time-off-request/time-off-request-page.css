@@ -1,0 +1,77 @@
+.time-off-request-container {
+    color: #10069F;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    font-family: Arial, sans-serif;
+}
+
+.time-off-request-container .time-off-request-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.time-off-request-container input {
+    border: 2px solid #10069F;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.time-off-request-container input:hover {
+    cursor: pointer;
+}
+
+.time-off-request-container input:focus {
+    border: 2px solid #10069F;
+    outline: none;
+}
+
+.time-off-request-container select {
+    border: 2px solid #10069F;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.time-off-request-container select:hover {
+    cursor: pointer;
+}
+
+.time-off-request-container select:focus {
+    border: 2px solid #10069F;
+    outline: none;
+}
+
+.center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.submit-button {
+    color: #000000;
+    background-color: #D8B34A;
+    border: none;
+    border-radius: 10px;
+
+    padding: 10px;
+}
+
+.submit-button:hover {
+    color: #ffffff;
+    background-color: #10069F;
+    border: none;
+    cursor: pointer;
+}

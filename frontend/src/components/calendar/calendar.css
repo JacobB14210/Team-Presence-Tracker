@@ -50,6 +50,18 @@
     cursor: pointer;
 }
 
+.react-aria-CalendarCell[data-today] {
+    border: 2px solid #D8B34A;
+    color: #000000;
+    background-color: #ffffff;
+}
+
+.react-aria-CalendarCell[data-today]:hover {
+    border: 2px solid #10069F;
+    color: #ffffff;
+    background-color: #10069F;
+}
+
 .react-aria-CalendarCell:hover {
     color: #ffffff;
     background-color: #10069F;
@@ -58,12 +70,6 @@
 .react-aria-CalendarCell[data-selected] {
     background-color: #10069F;
     color: #ffffff;
-}
-
-.react-aria-CalendarCell[data-today] {
-    border: 2px solid #10069F;
-    color: #000000;
-    background-color: #ffffff;
 }
 
 .react-aria-CalendarCell[data-disabled] {
@@ -83,13 +89,13 @@
     font-family: Arial, sans-serif;
 }
 
-.calendar-container .calendar-information {
+.calendar-information {
     display: flex;
     flex-direction: row;
     gap: 20px;
 }
 
-.calendar-container .time-off-requests {
+.time-off-requests {
     color: #ffffff;
     background-color: #10069F;
 

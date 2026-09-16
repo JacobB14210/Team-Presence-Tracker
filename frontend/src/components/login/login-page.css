@@ -5,9 +5,11 @@
   flex-direction: column;
   align-items: center;
   gap: 15px;
+
+  font-family: Arial, sans-serif;
 }
 
-.login-container img {
+img {
   width: 300px;
   height: auto;
   margin-bottom: -60px;
@@ -51,7 +53,7 @@
   cursor: pointer;
 }
 
-.login-container .create-button {
+.create-button {
   color: #000000;
   background-color: #ffffff;
   border: 2px solid #D8B34A;

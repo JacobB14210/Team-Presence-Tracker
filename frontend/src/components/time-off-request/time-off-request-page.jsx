@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Dashboard } from "../component-index";
 
+import "./time-off-request-page.css"
+
 export function Time() {
     const [startDate, setStart] = useState("");
     const [endDate, setEnd] = useState("");
@@ -82,77 +84,82 @@ export function Time() {
     return (
         <div>
             <Dashboard />
-            <h1>Time Off Request</h1>
+            <div className="time-off-request-container">
+                <h1>Time Off Request</h1>
 
-            <form onSubmit={handleRequestOff}>
-                <label>Start Date: </label>
-                <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) =>
-                        setStart(e.target.value)}/>
-                
-                <br /><br />
+                <form onSubmit={handleRequestOff} className="time-off-request-form">
+                    <div className="date-container">
+                        <div className="center">
+                            <label>Start Date</label>
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) =>
+                                    setStart(e.target.value)}/>
+                        </div>
+                        
+                        <div className="center">
+                            <input
+                                type="checkbox"
+                                checked={leaveEarly}
+                                onChange={(e) => setLeaveEarly(e.target.checked)}/>
+                            <label>Leave early</label>
+                            {leaveEarly && (
+                                <input
+                                    type="time"
+                                    value={leaveTime}
+                                    onChange={(e) => setLeaveTime(e.target.value)}/>
+                            )}
+                        </div>
+                        
+                    </div>
+                    
+                    <div className="date-container">
+                        <div className="center">
+                            <label>End Date</label>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) =>
+                                    setEnd(e.target.value)}/>
+                        </div>
+                        
+                        <div className="center">
+                            <input
+                                type="checkbox"
+                                checked={returnLate}
+                                onChange={(e) => setReturnLate(e.target.checked)}/>
+                            <label>Return late</label>
+                            {returnLate && (
+                                <input
+                                    type="time"
+                                    value={returnTime}
+                                    onChange={(e) => setReturnTime(e.target.value)}/>
+                            )}
+                        </div>
+                    </div>
 
-                <label>End Date: </label>
-                <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) =>
-                        setEnd(e.target.value)}/>
+                    <div className="center">
+                        <label>Select a reason</label>
+                        <select
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}>
+                            <option value="" disabled>Select an option</option>
+                            <option value="sick">Sick</option>
+                            <option value="vacation">Vacation</option>
+                            <option value="personal">Personal</option>
+                            <option value="non-work">Non-work</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" className="submit-button">
+                        Submit Time Off Request
+                    </button>
+                </form>
 
-                <br /><br />
-
-                <label>Select a reason: </label>
-                <select
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}>
-                    <option value="" disabled>Select an option...</option>
-                    <option value="sick">Sick</option>
-                    <option value="vacation">Vacation</option>
-                    <option value="personal">Personal</option>
-                    <option value="non-work">Non-work</option>
-                </select>
-                
-                <br /><br />
-
-                <label>First day:</label>
-                <input
-                    type="checkbox"
-                    checked={leaveEarly}
-                    onChange={(e) => setLeaveEarly(e.target.checked)}/>
-                <label>Leave early</label>
-                {leaveEarly && (
-                    <input
-                        type="time"
-                        value={leaveTime}
-                        onChange={(e) => setLeaveTime(e.target.value)}/>
-                )}
-
-                <br /><br />
-
-                <label>Last day:</label>
-                <input
-                    type="checkbox"
-                    checked={returnLate}
-                    onChange={(e) => setReturnLate(e.target.checked)}/>
-
-                <label>Return late</label>
-                {returnLate && (
-                    <input
-                        type="time"
-                        value={returnTime}
-                        onChange={(e) => setReturnTime(e.target.value)}/>
-                )}
-
-                <br /><br />
-
-                <button type="submit">
-                    Submit Time Off Request
-                </button>
-            </form>
-
-            <p>{message}</p>
+                <p>{message}</p>
+            </div>
+            
         </div>
     );
 }
