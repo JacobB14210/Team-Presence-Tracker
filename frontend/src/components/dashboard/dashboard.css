@@ -1,0 +1,45 @@
+.dashboard-container {
+    background-color: #D8B34A;
+
+    width: 100%;
+
+    box-sizing: border-box;
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+
+    font-family: Arial, sans-serif;
+}
+
+.dashboard-container img {
+    width: 60px;
+    height: 100%;
+}
+
+.dashboard-buttons {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-buttons button {
+    color: #000000;
+    background-color: #D8B34A;
+    border: none;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    font-size: 20px;
+}
+
+.dashboard-container button:hover {
+    color: #ffffff;
+    background-color: #10069f;
+    border: none;
+
+    cursor: pointer;
+}

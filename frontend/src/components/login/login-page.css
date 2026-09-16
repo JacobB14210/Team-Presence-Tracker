@@ -9,7 +9,7 @@
   font-family: Arial, sans-serif;
 }
 
-img {
+.login-container img {
   width: 300px;
   height: auto;
   margin-bottom: -60px;
@@ -23,12 +23,13 @@ img {
 }
 
 .login-container input {
+  border: 2px solid #10069F;
+
   width: 300px;
+  padding: 10px;
 
   box-sizing: border-box;
-  border: 2px solid #10069F;
   border-radius: 10px;
-  padding: 10px;
 }
 
 .login-container input:focus {
@@ -37,19 +38,21 @@ img {
 }
 
 .login-container button {
-  width: 300px;
   color: #000000;
   background-color: #D8B34A;
   border: none;
-  border-radius: 10px;
 
+  width: 300px;
   padding: 10px;
+  
+  border-radius: 10px;
 }
 
 .login-container button:hover {
   color: #ffffff;
   background-color: #10069F;
   border: none;
+
   cursor: pointer;
 }
 

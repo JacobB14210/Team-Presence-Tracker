@@ -1,4 +1,7 @@
 .react-aria-Calendar {
+    background-color: white;
+    border: 1px solid #ddd;
+
     width: 350px;
     padding: 20px;
 
@@ -6,8 +9,6 @@
     flex-direction: column;
     gap: 15px;
 
-    background-color: white;
-    border: 1px solid #ddd;
     border-radius: 12px;
 }
 
@@ -36,11 +37,11 @@
 }
 
 .react-aria-CalendarCell {
-    width: 40px;
-    height: 40px;
-
     color: #000000;
     background-color: #D8B34A;
+
+    width: 40px;
+    height: 40px;
 
     display: flex;
     align-items: center;
@@ -51,15 +52,16 @@
 }
 
 .react-aria-CalendarCell[data-today] {
-    border: 2px solid #D8B34A;
     color: #000000;
     background-color: #ffffff;
+    border: 2px solid #D8B34A;
+
 }
 
 .react-aria-CalendarCell[data-today]:hover {
-    border: 2px solid #10069F;
     color: #ffffff;
     background-color: #10069F;
+    border: 2px solid #10069F;
 }
 
 .react-aria-CalendarCell:hover {
@@ -68,13 +70,14 @@
 }
 
 .react-aria-CalendarCell[data-selected] {
-    background-color: #10069F;
     color: #ffffff;
+    background-color: #10069F;
 }
 
 .react-aria-CalendarCell[data-disabled] {
     color: #aaa;
     background-color: #ffffff;
+
     cursor: not-allowed;
 }
 
@@ -109,14 +112,16 @@
     color: #000000;
     background-color: #D8B34A;
     border: none;
-    border-radius: 10px;
 
     padding: 10px;
+
+    border-radius: 10px;
 }
 
 .calendar-container button:hover {
     color: #ffffff;
     background-color: #10069F;
     border: none;
+    
     cursor: pointer;
 }
