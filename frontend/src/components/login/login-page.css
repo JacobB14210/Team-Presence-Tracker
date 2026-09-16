@@ -24,19 +24,19 @@
   gap: 15px;
 }
 
-input {
+.login-container input {
   width: 300px;
   border: 2px solid #10069F;
   border-radius: 10px;
   padding: 10px;
 }
 
-input:focus {
+.login-container input:focus {
   border: 2px solid #10069F;
   outline: none;
 }
 
-button {
+.login-container button {
   width: 300px;
   color: #000000;
   background-color: #D8B34A;
@@ -46,7 +46,7 @@ button {
   padding: 10px;
 }
 
-button:hover {
+.login-container button:hover {
   color: #ffffff;
   background-color: #10069F;
   border: none;
