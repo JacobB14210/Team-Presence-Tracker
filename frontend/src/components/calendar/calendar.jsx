@@ -8,6 +8,31 @@ import "./calendar.css"
 export function Calendar() {
     const [date, setDate] = useState(today(getLocalTimeZone()));
     const [requests, setRequests] = useState([]);
+    const [calendarRequests, setCalendarRequests] = useState([]);
+
+    useEffect(() => {
+        const getAllRequests = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/all-time-off");
+
+                const data = await response.json();
+
+                if (data.success) {
+                    setCalendarRequests(data.requests);
+                }
+                else {
+                    setCalendarRequests([]);
+                }
+            }
+            catch (error) {
+                console.error("Error getting all time off requests: ", error);
+
+                setCalendarRequests([]);
+            }
+        };
+
+        getAllRequests();
+    }, []);
 
     useEffect(() => {
         if (!date) return;
@@ -36,6 +61,23 @@ export function Calendar() {
     
     }, [date]);
 
+    const hasRequest = (calendarDate) => {
+
+        const dateString = calendarDate.toString();
+
+        return calendarRequests.some((request) => {
+            const startDate = new Date(request.start_date)
+                .toISOString()
+                .split("T")[0];
+
+            const endDate = new Date(request.end_date)
+                .toISOString()
+                .split("T")[0];
+
+            return dateString >= startDate && dateString <= endDate;
+        });
+    };
+
     return (
         <div>
             <Dashboard />
@@ -57,7 +99,9 @@ export function Calendar() {
 
                         <CalendarGrid>
                             {(date) => (
-                                <CalendarCell date={date} />
+                                <CalendarCell
+                                    date={date}
+                                    className={hasRequest(date) ? "has-request" : null}/>
                             )}
                         </CalendarGrid>
 
@@ -69,7 +113,7 @@ export function Calendar() {
                             {date.toString()}
                         </p>
 
-                        {requests == 0 ? (
+                        {requests.length === 0 ? (
                             <p>
                                 No time off requests for this day
                             </p>

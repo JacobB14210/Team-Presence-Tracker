@@ -233,6 +233,47 @@ app.get("/time-off", (req, res) => {
     })
 })
 
+// Get ALL time off requests
+app.get("/all-time-off", (req, res) => {
+    const getAllRequestsSQL = `
+        SELECT
+            time_off.id,
+            time_off.user_id,
+            users.name,
+            time_off.start_date,
+            time_off.end_date,
+            time_off.reason,
+            time_off.leave_early,
+            time_off.return_late,
+            time_off.leave_time,
+            time_off.return_time
+        FROM time_off
+        JOIN users
+            ON time_off.user_id = users.id
+    `;
+
+    db.query(getAllRequestsSQL, (err, results) => {
+        if (err) {
+            console.error(
+                "Error getting all time off requests:",
+                err
+            );
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to get time off requests"
+            });
+        }
+
+        res.json({
+            success: true,
+            requests: results
+        });
+        console.log(results);
+    });
+    console.log("Got all time off")
+});
+
 app.listen(5000, () => {
     console.log("Server running on port 5000");
 });
