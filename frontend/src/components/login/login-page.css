@@ -56,7 +56,7 @@
   cursor: pointer;
 }
 
-.create-button {
+.login-container .create-button {
   color: #000000;
   background-color: #ffffff;
   border: 2px solid #D8B34A;
