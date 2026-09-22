@@ -1,6 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const cron = require("node-cron");
+const nodemailer = require("nodemailer");
+
 const app = express();
 
 app.use(cors());
@@ -30,6 +35,58 @@ db.connect((err) => { // Checks for connection fail
     }
 
     console.log("Connected to Database");
+});
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+async function sendDailyEmail(emails) {
+    try {
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: emails, // Change for every email
+            subject: "Team Presence Update",
+            text: "Good morning! Here is today's team presence update."
+        });
+
+        console.log("Daily email sent successfully");
+    } catch (error) {
+        console.error("Error sending daily email:", error);
+    }
+}
+
+cron.schedule("0 9 * * 1-5", () => {
+    const getEmailsSQL = `
+        SELECT email FROM users`;
+
+    db.query(getEmailsSQL, (err, results) => {
+        if (err) {
+            console.error("Error creating time off request:", err);
+        }
+
+        const emails = results.map(user => user.email);
+
+        console.log("Emails:", emails);
+
+        sendDailyEmail(emails);
+    })
+});
+
+// TODO: Delete after
+app.get("/test-email", (req, res) => {
+    const testEmail = ["jake.m.barrios@gmail.com"];
+
+    sendDailyEmail(testEmail);
+
+    res.json({
+        success: true,
+        message: "Test email requested"
+    });
 });
 
 // Post login from login page
