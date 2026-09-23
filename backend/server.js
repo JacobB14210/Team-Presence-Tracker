@@ -41,7 +41,7 @@ const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        pass: process.env.GOOGLE_APP_PASS
     }
 });
 
@@ -78,15 +78,25 @@ cron.schedule("0 9 * * 1-5", () => {
 });
 
 // TODO: Delete after
+// http://localhost:5000/test-email
 app.get("/test-email", (req, res) => {
-    const testEmail = ["jake.m.barrios@gmail.com"];
+    try {
+        const testEmail = ["jake.m.barrios@gmail.com"];
 
-    sendDailyEmail(testEmail);
+        sendDailyEmail(testEmail);
 
-    res.json({
-        success: true,
-        message: "Test email requested"
-    });
+        res.json({
+            success: true,
+            message: "Test email requested"
+        });
+    }
+    catch (error) {
+        console.error("Error sending daily email:", error);
+        return res.json({
+            success: false,
+            message: error
+        })
+    }
 });
 
 // Post login from login page
