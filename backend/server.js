@@ -230,7 +230,8 @@ app.post("/login", (req, res) => {
                 success: true,
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                emp_type: user.emp_type
             });
         }
 
@@ -280,7 +281,8 @@ app.post("/google-login", async (req, res) => {
                 success: true,
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                emp_type: user.emp_type
             });
         });
     }

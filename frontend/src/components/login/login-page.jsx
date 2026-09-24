@@ -36,7 +36,8 @@ export function Login() {
             const user = {
                 id: data.id,
                 name: data.name,
-                email: data.email
+                email: data.email,
+                role: data.emp_type
             };
 
             localStorage.setItem("currentUser", JSON.stringify(user));
@@ -69,7 +70,8 @@ export function Login() {
             const user = {
                 id: data.id,
                 name: data.name,
-                email: data.email
+                email: data.email,
+                role: data.emp_type
             };
 
             localStorage.setItem("currentUser", JSON.stringify(user));
