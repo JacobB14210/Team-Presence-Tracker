@@ -47,17 +47,28 @@ const transporter = nodemailer.createTransport({
 });
 
 // Schedule sendDailyEmails function every 9 am, mon - fri
-cron.schedule("0 9 * * 1-5", () => {
-    sendDailyEmail();
+cron.schedule("0 9 * * 1-5", async () => {
+    const today = new Date().toISOString().split("T")[0];
+    const timeOffResults = await getAllTimeOff(today); // Get all user's time off for today
+
+    const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
+    const text = buildEmailText(timeOffResults, today); // Format text of email
+
+    await sendDailyEmail(emailResults, text);
 });
 
 // TODO: Delete after
-// http://localhost:5000/test-email
-app.get("/test-email", async (req, res) => {
+// http://localhost:5000/demo
+app.get("/demo", async (req, res) => {
     try {
         await testNoTimeOff();
 
-        // sendDailyEmail();
+        const today = new Date().toISOString().split("T")[0];
+        const timeOffResults = await getAllTimeOff(today); // Get all user's time off for today
+
+        const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
+        const text = buildEmailText(timeOffResults, today); // Format text of email
+        await sendDailyEmail(emailResults, text); // Test a normal email
 
         res.json({
             success: true,
@@ -74,22 +85,16 @@ app.get("/test-email", async (req, res) => {
     }
 });
 
+// Test for when there is no time off that day
 async function testNoTimeOff() {
     try {
         const date = new Date("2026-09-14");
-
         const timeOffResults = await getAllTimeOff(date);
 
         const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
         const text = buildEmailText(timeOffResults, date); // Format text of email
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: emailResults,
-            subject: "Team Presence Update",
-            text: `${text}`
-        });
-
-        console.log("Daily email sent successfully");
+        
+        await sendDailyEmail(emailResults, text);
     }
     catch (error) {
       console.error("Error sending daily email:", error);
@@ -97,16 +102,11 @@ async function testNoTimeOff() {
 }
 
 // Sends the email
-async function sendDailyEmail() {
+async function sendDailyEmail(emails, text) {
     try {
-        const today = new Date().toISOString().split("T")[0];
-        const timeOffResults = await getAllTimeOff(today); // Get all user's time off for today
-
-        const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
-        const text = buildEmailText(timeOffResults, today); // Format text of email
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: emailResults,
+            to: emails,
             subject: "Team Presence Update",
             text: `${text}`
         });
