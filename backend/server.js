@@ -37,6 +37,7 @@ db.connect((err) => { // Checks for connection fail
     console.log("Connected to Database");
 });
 
+// Authenticate the gmail user
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -45,59 +46,160 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-async function sendDailyEmail(emails) {
-    try {
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: emails, // Change for every email
-            subject: "Team Presence Update",
-            text: "Good morning! Here is today's team presence update."
-        });
-
-        console.log("Daily email sent successfully");
-    } catch (error) {
-        console.error("Error sending daily email:", error);
-    }
-}
-
+// Schedule sendDailyEmails function every 9 am, mon - fri
 cron.schedule("0 9 * * 1-5", () => {
-    const getEmailsSQL = `
-        SELECT email FROM users`;
-
-    db.query(getEmailsSQL, (err, results) => {
-        if (err) {
-            console.error("Error creating time off request:", err);
-        }
-
-        const emails = results.map(user => user.email);
-
-        console.log("Emails:", emails);
-
-        sendDailyEmail(emails);
-    })
+    sendDailyEmail();
 });
 
 // TODO: Delete after
 // http://localhost:5000/test-email
-app.get("/test-email", (req, res) => {
+app.get("/test-email", async (req, res) => {
     try {
-        const testEmail = ["jake.m.barrios@gmail.com"];
+        await testNoTimeOff();
 
-        sendDailyEmail(testEmail);
+        // sendDailyEmail();
 
         res.json({
             success: true,
-            message: "Test email requested"
+            message: "Test email sent"
         });
     }
     catch (error) {
-        console.error("Error sending daily email:", error);
-        return res.json({
+        console.error("Test text error:", error);
+
+        res.status(500).json({
             success: false,
-            message: error
-        })
+            message: "Failed to send email"
+        });
     }
 });
+
+async function testNoTimeOff() {
+    try {
+        const date = new Date("2026-09-14");
+
+        const timeOffResults = await getAllTimeOff(date);
+
+        const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
+        const text = buildEmailText(timeOffResults, date); // Format text of email
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: emailResults,
+            subject: "Team Presence Update",
+            text: `${text}`
+        });
+
+        console.log("Daily email sent successfully");
+    }
+    catch (error) {
+      console.error("Error sending daily email:", error);
+    }
+}
+
+// Sends the email
+async function sendDailyEmail() {
+    try {
+        const today = new Date().toISOString().split("T")[0];
+        const timeOffResults = await getAllTimeOff(today); // Get all user's time off for today
+
+        const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
+        const text = buildEmailText(timeOffResults, today); // Format text of email
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: emailResults,
+            subject: "Team Presence Update",
+            text: `${text}`
+        });
+
+        console.log("Daily email sent successfully");
+    }
+    catch (error) {
+        console.error("Error sending daily email:", error);
+    }
+}
+
+// Build text of the email
+function buildEmailText(timeOffResults, today) {
+    let text = "";
+
+    if (timeOffResults.length === 0) {
+        return "No approved time off"
+    }
+
+    timeOffResults.forEach((request, index) => {
+        text += `${index + 1}. ${request.name}`;
+
+        const startDate = new Date(request.start_date)
+            .toISOString()
+            .split("T")[0];
+
+        const endDate = new Date(request.end_date)
+            .toISOString()
+            .split("T")[0];
+
+        if (request.leave_early && startDate === today) {
+            text += `, Leave early: ${request.leave_time}`;
+        }
+
+        if (request.return_late && endDate === today) {
+            text += `, Return late: ${request.return_time}`;
+        }
+
+        text += "\n";
+        
+    });
+
+    return text;
+
+}
+
+// Get all the emails to send daily notification to
+async function getAllEmails() {
+    const getEmailsSQL = `SELECT email FROM users`;
+
+    return new Promise((resolve, reject) => {
+        db.query(getEmailsSQL, (err, res) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            const emails = res.map(user => user.email);
+
+            resolve(emails);
+        });
+    });
+}
+
+// Get all the approved time off for the date
+async function getAllTimeOff(date) {
+    const getTimeOffSQL = `
+        SELECT
+            time_off.id,
+            time_off.user_id,
+            users.name,
+            time_off.start_date,
+            time_off.end_date,
+            time_off.leave_early,
+            time_off.return_late,
+            time_off.leave_time,
+            time_off.return_time
+        FROM time_off
+        JOIN users
+            ON time_off.user_id = users.id
+        WHERE ? BETWEEN time_off.start_date AND time_off.end_date`;
+
+    return new Promise((resolve, reject) => {
+        db.query(getTimeOffSQL, [date], (err, results) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            resolve(results);
+        });
+    });
+}
 
 // Post login from login page
 app.post("/login", (req, res) => {
@@ -196,8 +298,7 @@ app.post("/create", (req, res) => {
     const { email, name, password, emp_type } = req.body;
 
     // Check if email already exists
-    const getEmailSQL =
-        "SELECT * FROM users WHERE email = ?";
+    const getEmailSQL = "SELECT * FROM users WHERE email = ?";
 
     db.query(getEmailSQL, [email], (err, results) => {
         if (err) {
