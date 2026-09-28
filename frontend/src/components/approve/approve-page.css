@@ -1,12 +1,24 @@
-requests {
+.approve-container {
+    color: #10069F;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    font-family: Arial, sans-serif;
+}
+
+.requests {
     background-color: white;
     border: 1px solid #ddd;
 
-    width: 350px;
+    width: 500px;
     padding: 20px;
 
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 15px;
 
     border-radius: 12px;

@@ -102,6 +102,8 @@
 }
 
 .calendar-container {
+    color: #10069F;
+    
     display: flex;
     flex-direction: column;
     align-items: center;

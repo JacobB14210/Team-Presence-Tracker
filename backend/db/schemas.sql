@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS time_off (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    approved BOOLEAN DEFAULT FALSE,
     user_id INT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,

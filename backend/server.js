@@ -46,8 +46,8 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Schedule sendDailyEmails function every 9 am, mon - fri
-cron.schedule("0 9 * * 1-5", async () => {
+// Schedule sendDailyEmails function every 7 am, mon - fri
+cron.schedule("0 7 * * 1-5", async () => {
     const today = new Date().toISOString().split("T")[0];
     const timeOffResults = await getAllTimeOff(today); // Get all user's time off for today
 
@@ -120,7 +120,7 @@ async function sendDailyEmail(emails, text) {
 
 // Build text of the email
 function buildEmailText(timeOffResults, today) {
-    let text = "";
+    let text = "Approved Time Off\n";
 
     if (timeOffResults.length === 0) {
         return "No approved time off"
@@ -423,6 +423,48 @@ app.get("/all-time-off", (req, res) => {
     `;
 
     db.query(getAllRequestsSQL, (err, results) => {
+        if (err) {
+            console.error(
+                "Error getting all time off requests:",
+                err
+            );
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to get time off requests"
+            });
+        }
+
+        res.json({
+            success: true,
+            requests: results
+        });
+        console.log(results);
+    });
+    console.log("Got all time off")
+});
+
+// Get all pending time off requests
+app.get("/pending", (req, res) => {
+    const getAllPendingSQL = `
+        SELECT
+            time_off.id,
+            time_off.user_id,
+            users.name,
+            time_off.start_date,
+            time_off.end_date,
+            time_off.reason,
+            time_off.leave_early,
+            time_off.return_late,
+            time_off.leave_time,
+            time_off.return_time
+        FROM time_off
+        JOIN users
+            ON time_off.user_id = users.id
+        WHERE approved = FALSE
+    `;
+
+    db.query(getAllPendingSQL, (err, results) => {
         if (err) {
             console.error(
                 "Error getting all time off requests:",

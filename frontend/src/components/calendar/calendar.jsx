@@ -119,7 +119,7 @@ export function Calendar() {
                             </p>
                         ) : (
                             requests.map((request) => (
-                                <div className="Request-Card" key={request.id}>
+                                <div className="request-card" key={request.id}>
                                     <p>
                                         <strong>
                                             {request.name}:
