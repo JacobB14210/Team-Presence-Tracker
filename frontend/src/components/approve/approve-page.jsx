@@ -13,16 +13,12 @@ export function Approve() {
 
                 const data = await response.json();
 
-                console.log(data);
-
                 if (data.success) {
                     setPendings(data.requests);
                 }
                 else {
                     setPendings([]);
                 }
-
-                console.log(pendings);
             }
             catch (error) {
                 console.error("Error getting all pending time off requests: ", error);
@@ -33,6 +29,80 @@ export function Approve() {
 
         getAllPendingRequests();
     }, []);
+
+    // Approve a time off request
+    const approveRequest = async (requestId) => {
+        try {
+            const response = await fetch(
+                "http://localhost:5000/approve-request",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        id: requestId
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            console.log(data);
+
+            if (data.success) {
+                // Remove the approved request from the pending list
+                setPendings((currentPendings) =>
+                    currentPendings.filter(
+                        (pending) => pending.id !== requestId
+                    )
+                );
+            }
+            else {
+                console.error("Failed to approve request:", data.message);
+            }
+        }
+        catch (error) {
+            console.error("Error approving request:", error);
+        }
+    };
+
+    // Approve a time off request
+    const denyRequest = async (requestId) => {
+        try {
+            const response = await fetch(
+                "http://localhost:5000/deny-request",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        id: requestId
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            console.log(data);
+
+            if (data.success) {
+                // Remove the approved request from the pending list
+                setPendings((currentPendings) =>
+                    currentPendings.filter(
+                        (pending) => pending.id !== requestId
+                    )
+                );
+            }
+            else {
+                console.error("Failed to deny request:", data.message);
+            }
+        }
+        catch (error) {
+            console.error("Error denying request:", error);
+        }
+    };
 
     return (
         <div className="approve-container">
@@ -65,10 +135,10 @@ export function Approve() {
                                         </ul>
                                     </div>
                                     <div className="approval-buttons">
-                                        <button className="approve-button">
+                                        <button className="approve-button" onClick={() => approveRequest(pending.id)}>
                                             Approve
                                         </button>
-                                        <button className="deny-button">
+                                        <button className="deny-button" onClick={() => denyRequest(pending.id)}>
                                             Deny
                                         </button>
                                     </div>

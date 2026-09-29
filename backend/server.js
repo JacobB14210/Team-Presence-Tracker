@@ -11,14 +11,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const { OAuth2Client } =
-    require("google-auth-library");
+const { OAuth2Client } = require("google-auth-library");
 
-const CLIENT_ID =
-    "957508522472-e4u0en5ghj58g7vqkfu8h8pb6dbnmke2.apps.googleusercontent.com";
+const CLIENT_ID = "957508522472-e4u0en5ghj58g7vqkfu8h8pb6dbnmke2.apps.googleusercontent.com";
 
-const client =
-new OAuth2Client(CLIENT_ID);
+const client = new OAuth2Client(CLIENT_ID);
 
 const db = mysql.createConnection({ // Connect to the SQL Server
     host: "127.0.0.1",
@@ -155,7 +152,8 @@ function buildEmailText(timeOffResults, today) {
 
 // Get all the emails to send daily notification to
 async function getAllEmails() {
-    const getEmailsSQL = `SELECT email FROM users`;
+    const getEmailsSQL =
+        "SELECT email FROM users";
 
     return new Promise((resolve, reject) => {
         db.query(getEmailsSQL, (err, res) => {
@@ -187,7 +185,9 @@ async function getAllTimeOff(date) {
         FROM time_off
         JOIN users
             ON time_off.user_id = users.id
-        WHERE ? BETWEEN time_off.start_date AND time_off.end_date`;
+        WHERE ? BETWEEN time_off.start_date AND time_off.end_date
+            AND status = 'approved'
+    `;
 
     return new Promise((resolve, reject) => {
         db.query(getTimeOffSQL, [date], (err, results) => {
@@ -252,11 +252,9 @@ app.post("/google-login", async (req, res) => {
                 audience: CLIENT_ID,
             });
 
-        const payload =
-            ticket.getPayload();
+        const payload = ticket.getPayload();
 
-        const email =
-            payload.email;
+        const email = payload.email;
 
         const getEmailSQL =
             "SELECT * FROM users WHERE email = ?";
@@ -300,7 +298,8 @@ app.post("/create", (req, res) => {
     const { email, name, password, emp_type } = req.body;
 
     // Check if email already exists
-    const getEmailSQL = "SELECT * FROM users WHERE email = ?";
+    const getEmailSQL =
+        "SELECT * FROM users WHERE email = ?";
 
     db.query(getEmailSQL, [email], (err, results) => {
         if (err) {
@@ -337,8 +336,7 @@ app.post("/create", (req, res) => {
 
 // Post time off request from time off request page
 app.post("/request-off", async (req, res) => {
-    const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime }
-        = req.body;
+    const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
 
     const insertTimeSQL = `INSERT INTO time_off 
         (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time) 
@@ -382,7 +380,9 @@ app.get("/time-off", (req, res) => {
         FROM time_off
         JOIN users
             ON time_off.user_id = users.id
-        WHERE ? BETWEEN time_off.start_date AND time_off.end_date`;
+        WHERE ? BETWEEN time_off.start_date AND time_off.end_date
+            AND status = 'approved'
+    `;
 
     db.query(getRequestCardSQL, [date], (err, results) => {
         if (err) {
@@ -393,8 +393,6 @@ app.get("/time-off", (req, res) => {
                 message: "Failed to create time off request"
             });
         }
-
-        console.log(results)
 
         res.json({
             success: true,
@@ -420,6 +418,7 @@ app.get("/all-time-off", (req, res) => {
         FROM time_off
         JOIN users
             ON time_off.user_id = users.id
+        WHERE status = 'approved'
     `;
 
     db.query(getAllRequestsSQL, (err, results) => {
@@ -439,9 +438,7 @@ app.get("/all-time-off", (req, res) => {
             success: true,
             requests: results
         });
-        console.log(results);
     });
-    console.log("Got all time off")
 });
 
 // Get all pending time off requests
@@ -461,7 +458,7 @@ app.get("/pending", (req, res) => {
         FROM time_off
         JOIN users
             ON time_off.user_id = users.id
-        WHERE approved = FALSE
+        WHERE status = 'pending'
     `;
 
     db.query(getAllPendingSQL, (err, results) => {
@@ -481,10 +478,66 @@ app.get("/pending", (req, res) => {
             success: true,
             requests: results
         });
-        console.log(results);
     });
-    console.log("Got all time off")
 });
+
+// Approve time off request
+app.post("/approve-request", (req, res) => {
+    const { id } = req.body;
+
+    const approveRequestSQL = `
+        UPDATE
+            time_off
+        SET
+            status = 'approved'
+        WHERE id = ?
+    `;
+
+    db.query(approveRequestSQL, [id], (err, results) => {
+        if (err) {
+            console.error("Error changing status of request: ", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to change status of request"
+            });
+        }
+
+        res.json({
+            success: true,
+        });
+    })
+    console.log("Approved request")
+})
+
+// Deny time off request
+app.post("/deny-request", (req, res) => {
+    const { id } = req.body;
+
+    const denyRequstSQL = `
+        UPDATE
+            time-off
+        SET
+            status = 'deny'
+        WHERE id = ?
+    `;
+
+    db.query(denyRequstSQL, [id], (err, results) => {
+        if (err) {
+            console.error("Error changing status of request: ", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to change status of request"
+            });
+        }
+
+        res.json({
+            success: true,
+        });
+    })
+    console.log("Denied request")
+})
 
 app.listen(5000, () => {
     console.log("Server running on port 5000");
