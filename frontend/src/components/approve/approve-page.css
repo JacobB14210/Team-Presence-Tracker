@@ -9,11 +9,11 @@
     font-family: Arial, sans-serif;
 }
 
-.requests {
+.pending-requests-container {
     background-color: white;
     border: 1px solid #ddd;
 
-    width: 500px;
+    width: 700px;
     padding: 20px;
 
     display: flex;
@@ -22,4 +22,82 @@
     gap: 15px;
 
     border-radius: 12px;
+
+    box-sizing: border-box;
+}
+
+.requests-list {
+    width: 100%;
+}
+
+.pending-request {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 15px 20px;
+    margin-bottom: 15px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.pending-request-info {
+    text-align: left;
+}
+
+.pending-request-info ul {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+}
+
+.pending-request-info li {
+    margin-bottom: 4px;
+}
+
+.approval-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: 20px;
+}
+
+.approval-buttons button {
+    border-radius: 6px;
+    
+    width: 100%;
+    padding: 10px 15px;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.approve-button {
+    color: #000000;
+    background-color: #D8B34A;
+    border: none;
+}
+
+.approve-button:hover {
+    color: #ffffff;
+    background-color: #10069F;
+}
+
+.deny-button {
+    color: #000000;
+    background-color: #f9f9f9;
+    border: 2px solid #D8B34A;
+}
+
+.deny-button:hover {
+    color: #ffffff;
+    background-color: #10069f;
+    border: 2px solid #10069f;
 }

@@ -12,7 +12,7 @@ export function Dashboard() {
             <img src={logo} alt="BPUSD-logo" />
             
             <div className="dashboard-buttons">
-                {currentUser?.role === "admin" && (
+                {currentUser?.role === "Admin" && (
                     <button
                         type="button"
                         onClick={() => navigate("/Approve")}>
