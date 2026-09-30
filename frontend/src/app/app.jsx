@@ -4,7 +4,7 @@ import { Login, Time, Calendar, Create, Approve } from '../components/component-
 function App() {
     return (
         <Routes>
-            {/* Assign path to each JSX component*/}
+            /* Assign path to each JSX component*/
             <Route path="/" element={<Login />} />
             <Route path="/Approve" element={<Approve />} />
             <Route path="/Time-Off" element={<Time />} />

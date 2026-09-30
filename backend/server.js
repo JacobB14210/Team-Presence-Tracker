@@ -13,15 +13,15 @@ app.use(express.json());
 
 const { OAuth2Client } = require("google-auth-library");
 
-const CLIENT_ID = "957508522472-e4u0en5ghj58g7vqkfu8h8pb6dbnmke2.apps.googleusercontent.com";
+const CLIENTID = process.env.GOOGLE_CLIENT_ID;
 
-const client = new OAuth2Client(CLIENT_ID);
+const client = new OAuth2Client(CLIENTID);
 
 const db = mysql.createConnection({ // Connect to the SQL Server
-    host: "127.0.0.1",
-    user: "root",
-    password: "JamsterSQL14210!",
-    database: "team_data"
+    host: process.env.SQL_HOST,
+    user: process.env.SQL_USER,
+    password: process.env.SQL_PASS,
+    database: process.env.SQL_DATABASE
 });
 
 db.connect((err) => { // Checks for connection fail
@@ -249,7 +249,7 @@ app.post("/google-login", async (req, res) => {
         const ticket =
             await client.verifyIdToken({
                 idToken: token,
-                audience: CLIENT_ID,
+                audience: CLIENTID,
             });
 
         const payload = ticket.getPayload();

@@ -5,7 +5,7 @@ import App from "./app/app";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
-        <GoogleOAuthProvider clientId="957508522472-e4u0en5ghj58g7vqkfu8h8pb6dbnmke2.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
             <App />
         </GoogleOAuthProvider>
     </BrowserRouter>
