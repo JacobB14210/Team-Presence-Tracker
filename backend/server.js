@@ -516,7 +516,7 @@ app.post("/deny-request", (req, res) => {
 
     const denyRequstSQL = `
         UPDATE
-            time-off
+            time_off
         SET
             status = 'deny'
         WHERE id = ?

@@ -107,44 +107,44 @@ export function Approve() {
     return (
         <div className="approve-container">
             <Dashboard />
-            <h1>Time Off Approve</h1>
+            <h1>Approve</h1>
             <div className="pending-requests-container">
                 <h2>Pending Time Off Requests</h2>
                 <div className="requests-list">
                     {pendings.length === 0 ? (
-                            <p>
-                                No time off requests for this day
-                            </p>
-                        ) : (
-                            pendings.map((pending, index) => (
-                                <div className="pending-request" key={pending.id}>
-                                    <div className="pending-request-info">
-                                        <strong>
-                                            {index + 1}. {pending.name}:
-                                        </strong>{" "}
-                                        {pending.reason}
-                                        <ul>
-                                            <li>
-                                                {"From: "}{new Date(pending.start_date).toISOString().split("T")[0]}
-                                                {pending.leave_early ? ` -- ${pending.leave_time}` : ""}
-                                            </li>
-                                            <li>
-                                                {"To: "}{new Date(pending.end_date).toISOString().split("T")[0]}
-                                                {pending.return_late ? ` -- ${pending.return_time}` : ""}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div className="approval-buttons">
-                                        <button className="approve-button" onClick={() => approveRequest(pending.id)}>
-                                            Approve
-                                        </button>
-                                        <button className="deny-button" onClick={() => denyRequest(pending.id)}>
-                                            Deny
-                                        </button>
-                                    </div>
+                        <p>
+                            No Pending Time Off Requests
+                        </p>
+                    ) : (
+                        pendings.map((pending, index) => (
+                            <div className="pending-request" key={pending.id}>
+                                <div className="pending-request-info">
+                                    <strong>
+                                        {index + 1}. {pending.name}:
+                                    </strong>{" "}
+                                    {pending.reason}
+                                    <ul>
+                                        <li>
+                                            {"From: "}{new Date(pending.start_date).toISOString().split("T")[0]}
+                                            {pending.leave_early ? ` -- ${pending.leave_time}` : ""}
+                                        </li>
+                                        <li>
+                                            {"To: "}{new Date(pending.end_date).toISOString().split("T")[0]}
+                                            {pending.return_late ? ` -- ${pending.return_time}` : ""}
+                                        </li>
+                                    </ul>
                                 </div>
-                            ))
-                        )}
+                                <div className="approval-buttons">
+                                    <button className="approve-button" onClick={() => approveRequest(pending.id)}>
+                                        Approve
+                                    </button>
+                                    <button className="deny-button" onClick={() => denyRequest(pending.id)}>
+                                        Deny
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>

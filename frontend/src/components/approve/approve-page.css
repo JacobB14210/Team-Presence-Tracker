@@ -30,6 +30,10 @@
     width: 100%;
 }
 
+.requests-list p {
+    text-align: center;
+}
+
 .pending-request {
     display: flex;
     flex-direction: row;
