@@ -94,8 +94,7 @@ export function Time() {
                             <input
                                 type="date"
                                 value={startDate}
-                                onChange={(e) =>
-                                    setStart(e.target.value)}/>
+                                onChange={(e) => setStart(e.target.value)}/>
                         </div>
                         
                         <div className="center">
@@ -120,8 +119,7 @@ export function Time() {
                             <input
                                 type="date"
                                 value={endDate}
-                                onChange={(e) =>
-                                    setEnd(e.target.value)}/>
+                                onChange={(e) => setEnd(e.target.value)}/>
                         </div>
                         
                         <div className="center">
