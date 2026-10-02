@@ -11,10 +11,9 @@ function App() {
             {/* Assign path to each JSX component */}
             <Route
                 path="/"
-                element={
-                    currentUser
-                        ? <Navigate to="/Calendar" replace />
-                        : <Login />}/>
+                element={currentUser ?
+                        <Navigate to="/Calendar" replace /> :
+                        <Login />}/>
 
             {!currentUser ? (
                 <Route
