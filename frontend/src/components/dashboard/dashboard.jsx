@@ -1,11 +1,19 @@
 import { useNavigate } from "react-router-dom";
 
 import "./dashboard.css"
+
 import logo from "../../assets/PBUSDLogo.png"
 
 export function Dashboard() {
     const navigate = useNavigate();
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    const handleSignOut = async (e) => {
+        e.preventDefault();
+
+        localStorage.removeItem("currentUser");
+        window.location.href = "/"
+    }
 
     return (
         <div className="dashboard-container">
@@ -19,6 +27,7 @@ export function Dashboard() {
                         Approve
                     </button>
                 )}
+
                 <button
                     type="button"
                     onClick={() => navigate("/Time-Off")}>
@@ -30,8 +39,13 @@ export function Dashboard() {
                     onClick={() => navigate("/Calendar")}>
                     Calendar
                 </button>
+
+                <button
+                    type="button"
+                    onClick={handleSignOut}>
+                    Sign Out
+                </button>
             </div>
-            
         </div>
     );
 }

@@ -43,7 +43,7 @@ export function Login() {
             localStorage.setItem("currentUser", JSON.stringify(user));
             
             // Navigate to calendar path
-            navigate('/Calendar');
+            window.location.href = "/Calendar";
         }
         else {
             setMessage("Invalid Email or Password");
@@ -77,7 +77,7 @@ export function Login() {
             localStorage.setItem("currentUser", JSON.stringify(user));
 
             // Navigate to calendar path
-            navigate('/Calendar');
+            window.location.href = "/Calendar";
         }
         else {
             setMessage("Account does not exist for that email");
