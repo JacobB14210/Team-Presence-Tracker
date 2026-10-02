@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import "./create-account-page.css";
+
 export function Create() {
     const navigate = useNavigate();
 
@@ -46,64 +48,49 @@ export function Create() {
     };
 
     return (
-        <div>
+        <div className="create-account-container">
             <h1>Create Account</h1>
 
-            <form onSubmit={handleCreateAccount}>
+            <form onSubmit={handleCreateAccount} className="create-account-form">
                 <input
                     type="name"
-                    placeholder="Name"
+                    placeholder="Full Name"
                     value={name}
                     onChange={(e) =>
-                        setName(e.target.value)
-                    }
-                />
-
-                <br /><br />
+                        setName(e.target.value)}/>
 
                 <input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) =>
-                        setEmail(e.target.value)}
-                />
-
-                <br /><br />
+                        setEmail(e.target.value)}/>
 
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
-                />
+                        setPassword(e.target.value)}/>
 
-                <br /><br />
-
-                <label htmlfor="emp_type">Choose Employee Type: </label>
-                <select
-                    name="emp_type"
-                    id="emp_type"
-                    onChange={(e) =>
-                        setEmp_Type(e.target.value)
-                    }>
-                    <option value="Intern">Intern</option>
-                    <option value="Full"> Full Time</option>
-                </select>
-
-                <br /><br />
-
-                <button type="submit">
+                <div className="emp-type-container">
+                    <label htmlfor="emp_type">Choose Employee Type: </label>
+                    <select
+                        name="emp_type"
+                        id="emp_type"
+                        onChange={(e) =>
+                            setEmp_Type(e.target.value)}>
+                        <option value="Intern">Intern</option>
+                        <option value="Full"> Full Time</option>
+                    </select>
+                </div>
+                
+                <button type="submit" className="create-account-button">
                     Create Account
                 </button>
-
             </form>
 
-            <br />
-
-            <button onClick={() => navigate("/")}>
+            <button onClick={() => navigate("/")} className="back-button">
                 Back to Login
             </button>
 

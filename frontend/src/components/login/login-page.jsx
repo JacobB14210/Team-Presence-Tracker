@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { GoogleLogin } from "@react-oauth/google";
 
 import "./login-page.css";
@@ -93,7 +92,6 @@ export function Login() {
             <h1>Login</h1>
 
             <form onSubmit={handleLogin} className="login-form">
-
                 <input
                     type="email"
                     placeholder="Email"
@@ -111,7 +109,6 @@ export function Login() {
                 <button type="submit" className="login-button">
                     Login
                 </button>
-
             </form>
 
             <GoogleLogin
