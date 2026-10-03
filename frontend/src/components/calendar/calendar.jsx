@@ -9,11 +9,16 @@ export function Calendar() {
     const [date, setDate] = useState(today(getLocalTimeZone()));
     const [requests, setRequests] = useState([]);
     const [calendarRequests, setCalendarRequests] = useState([]);
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
     useEffect(() => {
         const getAllRequests = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/all-time-off`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/all-time-off`, {
+                    headers: {
+                        Authorization: `Bearer ${currentUser.token}`
+                    }
+                });
 
                 const data = await response.json();
 
@@ -39,7 +44,11 @@ export function Calendar() {
 
         const getRequest = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/time-off?date=${date}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/time-off?date=${date}`, {
+                    headers: {
+                        Authorization: `Bearer ${currentUser.token}`
+                    }
+                });
 
                 const data = await response.json();
 

@@ -69,6 +69,7 @@ export function Login() {
 
         if (data.success) {
             const user = {
+                token: data.token,
                 id: data.id,
                 name: data.name,
                 email: data.email,

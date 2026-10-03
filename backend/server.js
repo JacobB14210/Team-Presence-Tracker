@@ -203,12 +203,14 @@ async function getAllTimeOff(date) {
     });
 }
 
+// Function to authenticate a user
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
 
     const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
+        console.log("Authentication required")
         return res.status(401).json({
             success: false,
             message: "Authentication required"
@@ -220,11 +222,14 @@ function authenticateToken(req, res, next) {
         process.env.JWT_SECRET,
         (err, user) => {
             if (err) {
+                console.log("Error Authenticating")
                 return res.status(403).json({
                     success: false,
                     message: "Invalid or expired token"
                 });
             }
+
+            console.log("Authenticated User")
 
             req.user = user;
 
@@ -233,19 +238,23 @@ function authenticateToken(req, res, next) {
     )
 }
 
+// Function to authenticate the Admin role
 function requireAdmin(req, res, next) {
     if (req.user.role !== "Admin") {
+        console.log("Admin role required")
         return res.status(403).json({
             success: false,
             message: "Admin access required"
         });
     }
 
+    console.log("Authenticated Admin")
+
     next();
 }
 
 // Get time off request for selected day
-app.get("/time-off", (req, res) => {
+app.get("/time-off", authenticateToken, (req, res) => {
     const { date } = req.query;
 
     const getRequestCardSQL = `
@@ -282,10 +291,10 @@ app.get("/time-off", (req, res) => {
             requests: results
         });
     })
-})
+});
 
 // Get ALL time off requests
-app.get("/all-time-off", (req, res) => {
+app.get("/all-time-off", authenticateToken, (req, res) => {
     const getAllRequestsSQL = `
         SELECT
             time_off.id,
@@ -325,7 +334,7 @@ app.get("/all-time-off", (req, res) => {
 });
 
 // Get all pending time off requests
-app.get("/pending", (req, res) => {
+app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
     const getAllPendingSQL = `
         SELECT
             time_off.id,
@@ -455,7 +464,19 @@ app.post("/google-login", async (req, res) => {
 
             const user = results[0];
 
+            const token = jwt.sign(
+                {
+                    id: user.id,
+                    role: user.emp_type
+                },
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: "1h"
+                }
+            );
+
             return res.json({
+                token: token,
                 success: true,
                 id: user.id,
                 name: user.name,
@@ -519,7 +540,7 @@ app.post("/create", async (req, res) => {
 });
 
 // Post time off request from time off request page
-app.post("/request-off", async (req, res) => {
+app.post("/request-off", authenticateToken, async (req, res) => {
     const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
 
     const insertTimeSQL = `INSERT INTO time_off 
@@ -543,10 +564,10 @@ app.post("/request-off", async (req, res) => {
             });
         }
     );
-})
+});
 
 // Approve time off request
-app.post("/approve-request", (req, res) => {
+app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
     const { id } = req.body;
 
     const approveRequestSQL = `
@@ -572,10 +593,10 @@ app.post("/approve-request", (req, res) => {
         });
     })
     console.log("Approved request")
-})
+});
 
 // Deny time off request
-app.post("/deny-request", (req, res) => {
+app.post("/deny-request", authenticateToken, requireAdmin, (req, res) => {
     const { id } = req.body;
 
     const denyRequstSQL = `
@@ -601,7 +622,7 @@ app.post("/deny-request", (req, res) => {
         });
     })
     console.log("Denied request")
-})
+});
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log("Server running on selected port");

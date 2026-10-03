@@ -5,11 +5,16 @@ import "./approve-page.css"
 
 export function Approve() {
     const [pendings, setPendings] =useState([]);
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
     useEffect(() => {
         const getAllPendingRequests = async () => {
             try {
-                const response = await fetch("http://localhost:5000/pending");
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/pending`, {
+                    headers: {
+                        Authorization: `Bearer ${currentUser.token}`
+                    }
+                });
 
                 const data = await response.json();
 
@@ -38,7 +43,8 @@ export function Approve() {
                 {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${currentUser.token}`
                     },
                     body: JSON.stringify({
                         id: requestId
@@ -75,7 +81,8 @@ export function Approve() {
                 {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${currentUser.token}`
                     },
                     body: JSON.stringify({
                         id: requestId

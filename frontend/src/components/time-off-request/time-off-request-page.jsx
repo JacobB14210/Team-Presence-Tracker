@@ -15,6 +15,8 @@ export function Time() {
 
     const [message, setMessage] = useState("");
 
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
     const handleRequestOff = async (e) => {
         e.preventDefault();
 
@@ -49,7 +51,8 @@ export function Time() {
             `${import.meta.env.VITE_API_URL}/request-off`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${currentUser.token}`
                 },
                 body: JSON.stringify({
                     userID,
