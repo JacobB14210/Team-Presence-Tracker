@@ -15,6 +15,8 @@ function App() {
                         <Navigate to="/Calendar" replace /> :
                         <Login />}/>
 
+            <Route path="/Create" element={<Create />} />
+
             {!currentUser ? (
                 <Route
                     path="*"

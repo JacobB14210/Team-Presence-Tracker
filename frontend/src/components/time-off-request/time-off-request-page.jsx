@@ -46,7 +46,7 @@ export function Time() {
         const userID = user.id;
 
         const response = await fetch(
-            "http://localhost:5000/request-off", {
+            `${import.meta.env.VITE_API_URL}/request-off`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

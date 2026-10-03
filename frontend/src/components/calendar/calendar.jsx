@@ -13,7 +13,7 @@ export function Calendar() {
     useEffect(() => {
         const getAllRequests = async () => {
             try {
-                const response = await fetch("http://localhost:5000/all-time-off");
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/all-time-off`);
 
                 const data = await response.json();
 
@@ -39,7 +39,7 @@ export function Calendar() {
 
         const getRequest = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/time-off?date=${date}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/time-off?date=${date}`);
 
                 const data = await response.json();
 

@@ -34,7 +34,7 @@ export function Approve() {
     const approveRequest = async (requestId) => {
         try {
             const response = await fetch(
-                "http://localhost:5000/approve-request",
+                `${import.meta.env.VITE_API_URL}/approve-request`,
                 {
                     method: "POST",
                     headers: {
@@ -71,7 +71,7 @@ export function Approve() {
     const denyRequest = async (requestId) => {
         try {
             const response = await fetch(
-                "http://localhost:5000/deny-request",
+                `${import.meta.env.VITE_API_URL}/deny-request`,
                 {
                     method: "POST",
                     headers: {

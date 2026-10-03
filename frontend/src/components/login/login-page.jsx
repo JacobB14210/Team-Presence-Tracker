@@ -17,7 +17,7 @@ export function Login() {
         e.preventDefault();
 
         const response = await fetch(
-            "http://localhost:5000/login",
+            `${import.meta.env.VITE_API_URL}/login`,
             {
                 method: "POST",
                 headers: {
@@ -52,7 +52,7 @@ export function Login() {
     
     const handleGoogleSuccess = async (credentialResponse) => {
         const response = await fetch(
-            "http://localhost:5000/google-login",
+            `${import.meta.env.VITE_API_URL}/google-login`,
             {
                 method: "POST",
                 headers: {

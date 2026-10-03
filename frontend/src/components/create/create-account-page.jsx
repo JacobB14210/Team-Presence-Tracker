@@ -21,7 +21,7 @@ export function Create() {
         }
         
         const response = await fetch(
-            "http://localhost:5000/create",
+            `${import.meta.env.VITE_API_URL}/create`,
             {
                 method: "POST",
                 headers: {
