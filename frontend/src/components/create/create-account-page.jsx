@@ -9,7 +9,7 @@ export function Create() {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
-    const [emp_type, setEmp_Type] = useState("");
+    const [emp_type, setEmp_Type] = useState("Intern");
     const [message, setMessage] = useState("");
 
     const handleCreateAccount = async (e) => {
@@ -74,7 +74,7 @@ export function Create() {
                         setPassword(e.target.value)}/>
 
                 <div className="emp-type-container">
-                    <label htmlfor="emp_type">Choose Employee Type: </label>
+                    <label htmlFor="emp_type">Choose Employee Type: </label>
                     <select
                         name="emp_type"
                         id="emp_type"

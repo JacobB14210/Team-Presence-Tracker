@@ -5,6 +5,8 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const cron = require("node-cron");
 const nodemailer = require("nodemailer");
+const bcrypt = require(`bcrypt`);
+const saltRounds = 10;
 
 const app = express();
 
@@ -55,7 +57,7 @@ cron.schedule("0 7 * * 1-5", async () => {
 });
 
 // TODO: Delete after
-// http://localhost:5000/demo
+// http://localhost:${port}/demo
 app.get("/demo", async (req, res) => {
     try {
         await testNoTimeOff();
@@ -202,13 +204,13 @@ async function getAllTimeOff(date) {
 }
 
 // Post login from login page
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     const getEmailSQL =
         "SELECT * FROM users WHERE email = ?";
 
-    db.query(getEmailSQL, [email], (err, results) => {
+    db.query(getEmailSQL, [email], async (err, results) => {
         if (err) {
             return res.status(500).json({
                 success: false
@@ -225,7 +227,12 @@ app.post("/login", (req, res) => {
         const user = results[0];
         
         // TODO: Hash password
-        if (user.pass_hash === password) {
+        const passwordMatch = await bcrypt.compare(
+            password,
+            user.pass_hash
+        );
+
+        if (passwordMatch) {
             return res.json({
                 success: true,
                 id: user.id,
@@ -294,14 +301,16 @@ app.post("/google-login", async (req, res) => {
 });
 
 // Post new account from create account page
-app.post("/create", (req, res) => {
+app.post("/create", async (req, res) => {
     const { email, name, password, emp_type } = req.body;
+
+    console.log(emp_type)
 
     // Check if email already exists
     const getEmailSQL =
         "SELECT * FROM users WHERE email = ?";
 
-    db.query(getEmailSQL, [email], (err, results) => {
+    db.query(getEmailSQL, [email], async (err, results) => {
         if (err) {
             return res.status(500).json({
                 success: false
@@ -315,10 +324,12 @@ app.post("/create", (req, res) => {
             });
         }
 
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         const insertUserSQL =
             "INSERT INTO users (email,name,pass_hash,emp_type) VALUES (?, ?, ?, ?)";
         
-        db.query(insertUserSQL, [email, name, password, emp_type], (err, results) => {
+        db.query(insertUserSQL, [email, name, hashedPassword, emp_type], (err, results) => {
             if (err) {
                 return res.status(500).json({
                     success: false,
@@ -539,6 +550,6 @@ app.post("/deny-request", (req, res) => {
     console.log("Denied request")
 })
 
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
+app.listen(process.env.SERVER_PORT, () => {
+    console.log("Server running on selected port");
 });
