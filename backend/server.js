@@ -48,7 +48,7 @@ const transporter = nodemailer.createTransport({
 // Schedule sendDailyEmails function every 7 am, mon - fri
 cron.schedule("0 7 * * 1-5", async () => {
     const today = new Date().toISOString().split("T")[0];
-    const timeOffResults = await getAllTimeOff(today); // Get all user's time off for today
+    const timeOffResults = await getAllApproved(today); // Get all user's time off for today
 
     const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
     const text = buildEmailText(timeOffResults, today); // Format text of email
@@ -63,7 +63,7 @@ app.get("/demo", async (req, res) => {
         await testNoTimeOff();
 
         const today = new Date().toISOString().split("T")[0];
-        const timeOffResults = await getAllTimeOff(today); // Get all user's time off for today
+        const timeOffResults = await getAllApproved(today); // Get all user's time off for today
 
         const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
         const text = buildEmailText(timeOffResults, today); // Format text of email
@@ -88,7 +88,7 @@ app.get("/demo", async (req, res) => {
 async function testNoTimeOff() {
     try {
         const date = new Date("2026-09-14");
-        const timeOffResults = await getAllTimeOff(date);
+        const timeOffResults = await getAllApproved(date);
 
         const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
         const text = buildEmailText(timeOffResults, date); // Format text of email
@@ -100,10 +100,10 @@ async function testNoTimeOff() {
     }
 }
 
-// Sends the email
+// Sends the daily email
 async function sendDailyEmail(emails, text) {
     try {
-        await transporter.sendMail({
+        await transporter.sendMail({ // Send the daily email
             from: process.env.EMAIL_USER,
             to: emails,
             subject: "Team Presence Update",
@@ -154,17 +154,19 @@ function buildEmailText(timeOffResults, today) {
 
 // Get all the emails to send daily notification to
 async function getAllEmails() {
-    const getEmailsSQL =
-        "SELECT email FROM users";
+    const getAllEmailsSQL = "SELECT email FROM users";
 
     return new Promise((resolve, reject) => {
-        db.query(getEmailsSQL, (err, res) => {
+        db.query(getAllEmailsSQL, (err, res) => {
             if (err) {
                 reject(err);
+
                 return;
             }
 
             const emails = res.map(user => user.email);
+
+            console.log("Retrieved all emails");
 
             resolve(emails);
         });
@@ -172,8 +174,8 @@ async function getAllEmails() {
 }
 
 // Get all the approved time off for the date
-async function getAllTimeOff(date) {
-    const getTimeOffSQL = `
+async function getAllApproved(date) {
+    const getAllApprovedSQL = `
         SELECT
             time_off.id,
             time_off.user_id,
@@ -192,11 +194,14 @@ async function getAllTimeOff(date) {
     `;
 
     return new Promise((resolve, reject) => {
-        db.query(getTimeOffSQL, [date], (err, results) => {
+        db.query(getAllApprovedSQL, [date], (err, results) => {
             if (err) {
                 reject(err);
+
                 return;
             }
+
+            console.log("Retrieved all approved time off")
 
             resolve(results);
         });
@@ -209,27 +214,29 @@ function authenticateToken(req, res, next) {
 
     const token = authHeader && authHeader.split(" ")[1];
 
-    if (!token) {
-        console.log("Authentication required")
+    if (!token) { // Check if user has authentication token
+        console.log("Authentication required");
+
         return res.status(401).json({
             success: false,
             message: "Authentication required"
-        })
+        });
     }
 
-    jwt.verify(
+    jwt.verify( // Create a JWT token
         token,
         process.env.JWT_SECRET,
         (err, user) => {
             if (err) {
-                console.log("Error Authenticating")
+                console.log("Error Authenticating");
+
                 return res.status(403).json({
                     success: false,
                     message: "Invalid or expired token"
                 });
             }
 
-            console.log("Authenticated User")
+            console.log("Authenticated User");
 
             req.user = user;
 
@@ -240,8 +247,9 @@ function authenticateToken(req, res, next) {
 
 // Function to authenticate the Admin role
 function requireAdmin(req, res, next) {
-    if (req.user.role !== "Admin") {
-        console.log("Admin role required")
+    if (req.user.role !== "Admin") { // Check if user has admin role
+        console.log("Admin access required");
+
         return res.status(403).json({
             success: false,
             message: "Admin access required"
@@ -253,11 +261,11 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-// Get time off request for selected day
+// Get approved time off for selected day
 app.get("/time-off", authenticateToken, (req, res) => {
     const { date } = req.query;
 
-    const getRequestCardSQL = `
+    const getApprovedTimeOffDateSQL = `
         SELECT
             time_off.id,
             time_off.user_id,
@@ -276,15 +284,17 @@ app.get("/time-off", authenticateToken, (req, res) => {
             AND status = 'approved'
     `;
 
-    db.query(getRequestCardSQL, [date], (err, results) => {
+    db.query(getApprovedTimeOffDateSQL, [date], (err, results) => {
         if (err) {
-            console.error("Error creating time off request:", err);
+            console.error(`Error getting approved time off for ${date}: `, err);
 
             return res.status(500).json({
                 success: false,
-                message: "Failed to create time off request"
+                message: `Failed to get approved time off for ${date}`
             });
         }
+
+        console.log(`Retrieved approved time off for ${date}`);
 
         res.json({
             success: true,
@@ -293,9 +303,9 @@ app.get("/time-off", authenticateToken, (req, res) => {
     })
 });
 
-// Get ALL time off requests
+// Get all approved time off
 app.get("/all-time-off", authenticateToken, (req, res) => {
-    const getAllRequestsSQL = `
+    const getAllApprovedTimeOffSQL = `
         SELECT
             time_off.id,
             time_off.user_id,
@@ -313,18 +323,17 @@ app.get("/all-time-off", authenticateToken, (req, res) => {
         WHERE status = 'approved'
     `;
 
-    db.query(getAllRequestsSQL, (err, results) => {
+    db.query(getAllApprovedTimeOffSQL, (err, results) => {
         if (err) {
-            console.error(
-                "Error getting all time off requests:",
-                err
-            );
+            console.error("Error getting all time off: ", err);
 
             return res.status(500).json({
                 success: false,
-                message: "Failed to get time off requests"
+                message: "Failed to get all approved time off"
             });
         }
+
+        console.log("Retrieved all approved time off");
 
         res.json({
             success: true,
@@ -355,16 +364,15 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
 
     db.query(getAllPendingSQL, (err, results) => {
         if (err) {
-            console.error(
-                "Error getting all time off requests:",
-                err
-            );
+            console.error("Error getting all pending time off requests: ",err);
 
             return res.status(500).json({
                 success: false,
-                message: "Failed to get time off requests"
+                message: "Failed to get all pending time off requests"
             });
         }
+
+        console.log("Retrieved all pending time off requests")
 
         res.json({
             success: true,
@@ -377,31 +385,34 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
-    const getEmailSQL =
-        "SELECT * FROM users WHERE email = ?";
+    const getEmailSQL = "SELECT * FROM users WHERE email = ?";
 
     db.query(getEmailSQL, [email], async (err, results) => {
         if (err) {
+            console.error("Error loging in: ", err);
+
             return res.status(500).json({
-                success: false
+                success: false,
+                message: "Login error"
             });
         }
 
         if (results.length === 0) { // Check if user exists in database
+            console.log(`User does not exist for email: ${email}`);
+
             return res.json({
                 success: false,
-                message: "User does not exist"
+                message: "Password or email is incorrect"
             });
         }
 
+        // Get only user in database
         const user = results[0];
         
-        // TODO: Hash password
-        const passwordMatch = await bcrypt.compare(
-            password,
-            user.pass_hash
-        );
+        // Check if hashed passwords match
+        const passwordMatch = await bcrypt.compare(password, user.pass_hash);
 
+        // Create jwt token for user if passwords match
         if (passwordMatch) {
             const token = jwt.sign(
                 {
@@ -414,6 +425,8 @@ app.post("/login", async (req, res) => {
                 }
             );
 
+            console.log(`Logged in and created JWT token for user ${email}`);
+
             return res.json({
                 success: true,
                 token: token,
@@ -425,7 +438,8 @@ app.post("/login", async (req, res) => {
         }
 
         return res.json({
-            success: false
+            success: false,
+            message: "Password or email is incorrect"
         });
     });
 });
@@ -445,20 +459,22 @@ app.post("/google-login", async (req, res) => {
 
         const email = payload.email;
 
-        const getEmailSQL =
-            "SELECT * FROM users WHERE email = ?";
+        const getEmailSQL = "SELECT * FROM users WHERE email = ?";
 
         db.query(getEmailSQL, [email], (err, results) => {
             if (err) {
+                console.error("Google login error: ", err);
+
                 return res.status(500).json({
-                    success: false
+                    success: false,
+                    message: "Google login error"
                 });
             }
 
             if (results.length === 0) { // Check if user exists in database
                 return res.json({
                     success: false,
-                    message: "User does not exist"
+                    message: "Password or email is incorrect"
                 });
             }
 
@@ -475,6 +491,8 @@ app.post("/google-login", async (req, res) => {
                 }
             );
 
+            console.log(`Logged in and created JWT token for user ${email}`);
+
             return res.json({
                 token: token,
                 success: true,
@@ -489,7 +507,8 @@ app.post("/google-login", async (req, res) => {
         console.error(err);
 
         return res.status(401).json({
-            success: false
+            success: false,
+            message: "Password or email is incorrect"
         });
     }
 });
@@ -498,16 +517,16 @@ app.post("/google-login", async (req, res) => {
 app.post("/create", async (req, res) => {
     const { email, name, password, emp_type } = req.body;
 
-    console.log(emp_type)
+    const getEmailSQL = "SELECT * FROM users WHERE email = ?";
 
     // Check if email already exists
-    const getEmailSQL =
-        "SELECT * FROM users WHERE email = ?";
-
     db.query(getEmailSQL, [email], async (err, results) => {
         if (err) {
+            console.error("Error checking for existing email");
+
             return res.status(500).json({
-                success: false
+                success: false,
+                message: "Error checking for existing email"
             });
         }
 
@@ -520,16 +539,24 @@ app.post("/create", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const insertUserSQL =
-            "INSERT INTO users (email,name,pass_hash,emp_type) VALUES (?, ?, ?, ?)";
+        const insertUserSQL = `
+            INSERT INTO users
+                (email,name,pass_hash,emp_type)
+            VALUES
+                (?, ?, ?, ?)
+        `;
         
         db.query(insertUserSQL, [email, name, hashedPassword, emp_type], (err, results) => {
             if (err) {
+                console.error("Error adding new user to database");
+
                 return res.status(500).json({
                     success: false,
                     message: "Error creating account"
                 });
             }
+
+            console.log("Created new user");
 
             return res.json({
                 success: true,
@@ -543,9 +570,12 @@ app.post("/create", async (req, res) => {
 app.post("/request-off", authenticateToken, async (req, res) => {
     const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
 
-    const insertTimeSQL = `INSERT INTO time_off 
-        (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const insertTimeSQL = `
+        INSERT INTO time_off
+            (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time)
+        VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     db.query(insertTimeSQL, [userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
         (err, results) => {
@@ -557,6 +587,8 @@ app.post("/request-off", authenticateToken, async (req, res) => {
                     message: "Failed to create time off request"
                 });
             }
+
+            console.log("Created a new time off request");
 
             return res.json({
                 success: true,
@@ -575,7 +607,8 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
             time_off
         SET
             status = 'approved'
-        WHERE id = ?
+        WHERE
+            id = ?
     `;
 
     db.query(approveRequestSQL, [id], (err, results) => {
@@ -588,11 +621,13 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
             });
         }
 
-        res.json({
+        console.log("Changed status of time off request to approve");
+
+        return res.json({
             success: true,
+            message: "Changed status of time off request to approve"
         });
     })
-    console.log("Approved request")
 });
 
 // Deny time off request
@@ -617,11 +652,13 @@ app.post("/deny-request", authenticateToken, requireAdmin, (req, res) => {
             });
         }
 
+        console.log("Changed staus of time off request to deny");
+
         res.json({
             success: true,
+            message: "Changed status of time off request to deny"
         });
     })
-    console.log("Denied request")
 });
 
 app.listen(process.env.SERVER_PORT, () => {
