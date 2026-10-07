@@ -568,13 +568,15 @@ app.post("/create", async (req, res) => {
 
 // Post time off request from time off request page
 app.post("/request-off", authenticateToken, async (req, res) => {
-    const { userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
+    const { startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime } = req.body;
+
+    const userID = req.user.id
 
     const insertTimeSQL = `
         INSERT INTO time_off
-            (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time)
+            (start_date, end_date, reason, leave_early, return_late, leave_time, return_time)
         VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(insertTimeSQL, [userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
