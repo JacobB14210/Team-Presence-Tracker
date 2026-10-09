@@ -44,9 +44,6 @@ export function Time() {
             }
         }
 
-        const user = JSON.parse(localStorage.getItem("currentUser"));
-        const userID = user.id;
-
         const response = await fetch(
             `${import.meta.env.VITE_API_URL}/request-off`, {
                 method: "POST",
@@ -55,7 +52,6 @@ export function Time() {
                     Authorization: `Bearer ${currentUser.token}`
                 },
                 body: JSON.stringify({
-                    userID,
                     startDate,
                     endDate,
                     reason,

@@ -10,7 +10,9 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL
+}));
 app.use(express.json());
 
 const { OAuth2Client } = require("google-auth-library");
@@ -49,56 +51,11 @@ const transporter = nodemailer.createTransport({
 cron.schedule("0 7 * * 1-5", async () => {
     const today = new Date().toISOString().split("T")[0];
     const timeOffResults = await getAllApproved(today); // Get all user's time off for today
-
-    const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
     const text = buildEmailText(timeOffResults, today); // Format text of email
+    const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
 
     await sendDailyEmail(emailResults, text);
 });
-
-// TODO: Delete after
-// http://localhost:${port}/demo
-app.get("/demo", async (req, res) => {
-    try {
-        await testNoTimeOff();
-
-        const today = new Date().toISOString().split("T")[0];
-        const timeOffResults = await getAllApproved(today); // Get all user's time off for today
-
-        const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
-        const text = buildEmailText(timeOffResults, today); // Format text of email
-        await sendDailyEmail(emailResults, text); // Test a normal email
-
-        res.json({
-            success: true,
-            message: "Test email sent"
-        });
-    }
-    catch (error) {
-        console.error("Test text error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Failed to send email"
-        });
-    }
-});
-
-// Test for when there is no time off that day
-async function testNoTimeOff() {
-    try {
-        const date = new Date("2026-09-14");
-        const timeOffResults = await getAllApproved(date);
-
-        const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
-        const text = buildEmailText(timeOffResults, date); // Format text of email
-        
-        await sendDailyEmail(emailResults, text);
-    }
-    catch (error) {
-      console.error("Error sending daily email:", error);
-    }
-}
 
 // Sends the daily email
 async function sendDailyEmail(emails, text) {
@@ -574,9 +531,9 @@ app.post("/request-off", authenticateToken, async (req, res) => {
 
     const insertTimeSQL = `
         INSERT INTO time_off
-            (start_date, end_date, reason, leave_early, return_late, leave_time, return_time)
+            (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time)
         VALUES
-            (?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(insertTimeSQL, [userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null],
@@ -663,6 +620,8 @@ app.post("/deny-request", authenticateToken, requireAdmin, (req, res) => {
     })
 });
 
-app.listen(process.env.SERVER_PORT, () => {
-    console.log("Server running on selected port");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
