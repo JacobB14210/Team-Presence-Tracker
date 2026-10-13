@@ -14,7 +14,7 @@ export function Calendar() {
     useEffect(() => {
         const getAllRequests = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/all-time-off`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/all-time-off`, { // Get all approved time off
                     headers: {
                         Authorization: `Bearer ${currentUser.token}`
                     }
@@ -44,7 +44,7 @@ export function Calendar() {
 
         const getRequest = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/time-off?date=${date}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/time-off?date=${date}`, { // Get all requests for the selected day
                     headers: {
                         Authorization: `Bearer ${currentUser.token}`
                     }

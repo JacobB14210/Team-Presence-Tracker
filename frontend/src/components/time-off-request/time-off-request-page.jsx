@@ -44,8 +44,7 @@ export function Time() {
             }
         }
 
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/request-off`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/request-off`, { // Create a time off reqeust
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
