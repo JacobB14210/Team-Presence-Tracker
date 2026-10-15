@@ -7,10 +7,11 @@ export function Approve() {
     const [pendings, setPendings] =useState([]);
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
+    // Run when browser runs
     useEffect(() => {
         const getAllPendingRequests = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/pending`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/pending`, { // Get all pending time off requests
                     headers: {
                         Authorization: `Bearer ${currentUser.token}`
                     }
@@ -38,9 +39,7 @@ export function Approve() {
     // Approve a time off request
     const approveRequest = async (requestId) => {
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/approve-request`,
-                {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/approve-request`, { // Approve time off request
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -76,9 +75,7 @@ export function Approve() {
     // Approve a time off request
     const denyRequest = async (requestId) => {
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/deny-request`,
-                {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/deny-request`, { // Deny time off request
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

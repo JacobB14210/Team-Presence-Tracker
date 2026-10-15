@@ -16,9 +16,7 @@ export function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/login`,
-            {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, { // Handles login credentials
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -52,9 +50,7 @@ export function Login() {
     };
     
     const handleGoogleSuccess = async (credentialResponse) => {
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/google-login`,
-            {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/google-login`, { // Handles google login credentials
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

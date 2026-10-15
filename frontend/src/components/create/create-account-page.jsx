@@ -20,9 +20,7 @@ export function Create() {
             return;
         }
         
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/create`,
-            {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/create`, { // Create a new account for user
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
