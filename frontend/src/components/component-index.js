@@ -4,3 +4,4 @@ export { Time } from './time-off-request/time-off-request-page';
 export { Calendar } from './calendar/calendar';
 export { Create } from './create/create-account-page';
 export { Approve } from './approve/approve-page';
+export { Requests } from './your-requests/your-requests-page';
