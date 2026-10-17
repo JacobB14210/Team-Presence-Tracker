@@ -27,7 +27,6 @@ function App() {
                     <Route path="/Time-Off" element={<Time />} />
                     <Route path="/Calendar" element={<Calendar />} />
                     <Route path="/Create" element={<Create />} />
-                    <Route path="/Requests" element={<Requests />} />
                 </>
             )}
         </Routes>
