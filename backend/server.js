@@ -218,15 +218,6 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-// Get all users time off requests
-app.get("users-time-off", authenticateToken, (req, res) => {
-    const { user } = req.query;
-
-    const getUsersTimeOfSQL = `
-        
-    `
-})
-
 // Get approved time off for selected day
 app.get("/time-off", authenticateToken, (req, res) => {
     const { date } = req.query;
