@@ -42,6 +42,12 @@ export function Dashboard() {
 
                 <button
                     type="button"
+                    onClick={() => navigate("/Requests")}>
+                    Your Requests
+                </button>
+
+                <button
+                    type="button"
                     onClick={handleSignOut}>
                     Sign Out
                 </button>

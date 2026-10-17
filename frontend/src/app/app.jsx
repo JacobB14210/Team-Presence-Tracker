@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Login, Time, Calendar, Create, Approve } from '../components/component-index';
+import { Login, Time, Calendar, Create, Approve, Requests } from '../components/component-index';
 
 function App() {
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
