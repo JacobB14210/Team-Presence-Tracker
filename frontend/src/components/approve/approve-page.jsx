@@ -4,7 +4,7 @@ import { Dashboard } from "../component-index";
 import "./approve-page.css"
 
 export function Approve() {
-    const [pendings, setPendings] =useState([]);
+    const [pendings, setPendings] = useState([]);
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
     // Run when browser runs

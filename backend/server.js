@@ -218,6 +218,37 @@ function requireAdmin(req, res, next) {
     next();
 }
 
+app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
+    const getAllUsersSQL = `
+        SELECT
+            email,
+            name,
+            sick,
+            vacation,
+            personal,
+            non_work
+        FROM users
+    `;
+
+     db.query(getAllUsersSQL, (err, results) => {
+        if (err) {
+            console.error("Error getting all users: ", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to get all users"
+            });
+        }
+
+        console.log("Retrieved all users");
+
+        res.json({
+            success: true,
+            users: results
+        });
+    })
+})
+
 // Get approved time off for selected day
 app.get("/time-off", authenticateToken, (req, res) => {
     const { date } = req.query;

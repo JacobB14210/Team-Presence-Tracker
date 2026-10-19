@@ -21,11 +21,19 @@ export function Dashboard() {
             
             <div className="dashboard-buttons">
                 {currentUser?.role === "Admin" && (
-                    <button
-                        type="button"
-                        onClick={() => navigate("/Approve")}>
-                        Approve
-                    </button>
+                    <div className="admin-buttons">
+                        <button
+                            type="button"
+                            onClick={() => navigate("/Approve")}>
+                            Approve
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => navigate("/Accounts")}>
+                            Accounts
+                        </button>
+                    </div>
                 )}
 
                 <button
