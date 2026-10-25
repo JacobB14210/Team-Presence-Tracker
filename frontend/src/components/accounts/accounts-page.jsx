@@ -142,7 +142,7 @@ export function Accounts() {
                                         }/>
                                 </div>
 
-                                <button onClick={() => updateHours(user)}>
+                                <button className="update-hours-button " onClick={() => updateHours(user)}>
                                     Update Hours
                                 </button>
                             </div>
