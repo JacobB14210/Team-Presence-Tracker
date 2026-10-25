@@ -221,6 +221,7 @@ function requireAdmin(req, res, next) {
 app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
     const getAllUsersSQL = `
         SELECT
+            id,
             email,
             name,
             sick,
@@ -366,6 +367,68 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
             success: true,
             requests: results
         });
+    });
+});
+
+app.put("/update-hours/:id", authenticateToken, requireAdmin, async (req, res) => {
+    const userId = Number(req.params.id);
+    const { sick, vacation, personal, non_work } = req.body;
+
+    // Validate employee ID
+    if (!Number.isInteger(userId) || userId <= 0) {
+        console.log("Invalid employee ID");
+        
+        return res.status(400).json({
+            success: false,
+            message: "Invalid employee ID"
+        });
+    }
+
+    // Validate hour values
+    const hours = [sick, vacation, personal, non_work];
+
+    const validHours = hours.every(value =>
+        value !== "" &&
+        value !== null &&
+        value !== undefined &&
+        Number.isFinite(Number(value)) &&
+        Number(value) >= 0
+    );
+
+    if (!validHours) {
+        console.log("Hours must be a non-negative numbers");
+
+        return res.status(400).json({
+            success: false,
+            message: "Hours must be non-negative numbers"
+        });
+    }
+
+    const updateHoursSQL = `
+        UPDATE
+            users
+        SET
+            sick = ?, vacation = ?, personal = ?, non_work = ?
+        WHERE
+            id = ?
+    `;
+
+    db.query(updateHoursSQL, [Number(sick), Number(vacation), Number(personal), Number(non_work), userId], async (err, results) => {
+        if (err) {
+            console.error("Error update user hours: ", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Update hours error"
+            });
+        }
+
+        console.log("Successfully changed hours");
+
+        res.json({
+            success: true,
+            message: "Changed hours"
+        })
     });
 });
 

@@ -24,12 +24,22 @@
     box-sizing: border-box;
 }
 
+.account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
 .account {
+    border: 1px solid #ddd;
 
     padding: 10px;
+    
     display: flex;
     flex-direction: row;
     align-items: center;
-
     gap: 15px;
+
+    border-radius: 12px;
 }
