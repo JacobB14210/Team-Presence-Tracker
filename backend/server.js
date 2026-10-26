@@ -218,6 +218,48 @@ function requireAdmin(req, res, next) {
     next();
 }
 
+app.get("/user-hours", authenticateToken, (req, res) => {
+    const userID = req.user.id
+
+    const getUserHoursSQL = `
+        SELECT
+            sick,
+            vacation,
+            non_work,
+            personal
+        FROM
+            users
+        WHERE
+            id =?
+    `;
+
+    db.query(getUserHoursSQL, [userID], (err, results) => {
+        if (err) {
+            console.error("Error getting hours for user: ", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to get hours for user"
+            });
+        }
+
+        if (results.length === 0) {
+            console.log("User not found");
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        console.log("Retreived user's hours");
+
+        res.json({
+            success: true,
+            hours: results[0]
+        });
+    })
+});
+
 app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
     const getAllUsersSQL = `
         SELECT
@@ -226,9 +268,10 @@ app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
             name,
             sick,
             vacation,
-            personal,
-            non_work
-        FROM users
+            non_work,
+            personal
+        FROM
+            users
     `;
 
      db.query(getAllUsersSQL, (err, results) => {
@@ -248,7 +291,7 @@ app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
             users: results
         });
     })
-})
+});
 
 // Get approved time off for selected day
 app.get("/time-off", authenticateToken, (req, res) => {

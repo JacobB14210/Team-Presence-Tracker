@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dashboard } from "../component-index";
 
 import "./time-off-request-page.css"
@@ -13,9 +13,49 @@ export function Time() {
     const [leaveTime, setLeaveTime] = useState("");
     const [returnTime, setReturnTime] = useState("");
 
+    const [sickHours, setSickHours] = useState(0);
+    const [vacationHours, setVacationHours] = useState(0);
+    const [nonWorkHours, setNonWorkHours] = useState(0);
+    const [personalHours, setPersonalHours] = useState(0);
+
     const [message, setMessage] = useState("");
 
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    useEffect(() => {
+        const handleHoursBalance = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/user-hours`, { // Get hours for a user
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${currentUser.token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    console.log(data.message);
+                }
+
+                setSickHours(data.hours.sick ?? 0);
+                setVacationHours(data.hours.vacation ?? 0);
+                setNonWorkHours(data.hours.non_work ?? 0);
+                setPersonalHours(data.hours.personal ?? 0);
+            }
+            catch (error) {
+                console.error("Error getting total hours balance for user: ", error);
+
+                setSickHours(0);
+                setVacationHours(0);
+                setNonWorkHours(0);
+                setPersonalHours(0);
+            }
+        };
+
+        handleHoursBalance();
+    }, []);
 
     const handleRequestOff = async (e) => {
         e.preventDefault();
@@ -154,7 +194,29 @@ export function Time() {
                 </form>
 
                 <p>{message}</p>
+
+                <div className="hours-information-container">
+                    <h1>Hours Balance</h1>
+                    <div className="hours-balance-container">
+                        <div className="hour">
+                            Sick:{" " + sickHours} hour(s)
+                        </div>
+                        <div className="hour">
+                            Vacation:{" " + vacationHours} hour(s)
+                        </div>
+                        <div className="hour">
+                            Non-Work:{" " + nonWorkHours} hour(s)
+                        </div>
+                        <div className="hour">
+                            Personal:{" " + personalHours} hour(s)
+                        </div>
+                    </div>
+                    <div className="request-history-container">
+
+                    </div>
+                </div>
             </div>
+
             
         </div>
     );

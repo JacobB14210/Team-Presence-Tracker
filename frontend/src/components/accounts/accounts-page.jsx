@@ -49,19 +49,18 @@ export function Accounts() {
     const updateHours = async (user) => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/update-hours/${user.id}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${currentUser.token}`
-                    },
-                    body: JSON.stringify({
-                        sick: Number(user.sick),
-                        vacation: Number(user.vacation),
-                        personal: Number(user.personal),
-                        non_work: Number(user.non_work)
-                    })
-                }
-            );
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${currentUser.token}`
+                },
+                body: JSON.stringify({
+                    sick: Number(user.sick),
+                    vacation: Number(user.vacation),
+                    personal: Number(user.personal),
+                    non_work: Number(user.non_work)
+                })
+            });
 
             const data = await response.json();
 
