@@ -218,6 +218,7 @@ function requireAdmin(req, res, next) {
     next();
 }
 
+// Get a users hours
 app.get("/user-hours", authenticateToken, (req, res) => {
     const userID = req.user.id
 
@@ -260,6 +261,7 @@ app.get("/user-hours", authenticateToken, (req, res) => {
     })
 });
 
+// Get information from all users
 app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
     const getAllUsersSQL = `
         SELECT
@@ -362,6 +364,41 @@ app.get("/all-time-off", authenticateToken, (req, res) => {
             return res.status(500).json({
                 success: false,
                 message: "Failed to get all approved time off"
+            });
+        }
+
+        console.log("Retrieved all approved time off");
+
+        res.json({
+            success: true,
+            requests: results
+        });
+    });
+});
+
+// Get all time off requests for a user
+app.get("/user-time-off", authenticateToken, (req, res) => {
+    const userID = req.user.id
+
+    const getAllUsersTimeOff =`
+        SELECT
+            time_off.start_date,
+            time_off.end_date,
+            time_off.status,
+            time_off.reason
+        FROM
+            time_off
+        WHERE
+            user_id = ?
+    `;
+
+    db.query(getAllUsersTimeOff, [userID], (err, results) => {
+        if (err) {
+            console.error("Error getting time off for a user: ", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to get time off for a user"
             });
         }
 

@@ -54,6 +54,29 @@ export function Time() {
             }
         };
 
+        const handleRequestHistory = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/user-time-off`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${currentUser.token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log(data.requests);
+                }
+            }
+            catch (error) {
+
+            }
+            
+        }
+
+        handleRequestHistory();
         handleHoursBalance();
     }, []);
 
@@ -124,7 +147,6 @@ export function Time() {
             <Dashboard />
             <div className="time-off-request-container">
                 <h1>Time Off Request</h1>
-
                 <form onSubmit={handleRequestOff} className="time-off-request-form">
                     <div className="date-container">
                         <div className="center">
@@ -211,8 +233,52 @@ export function Time() {
                             Personal:{" " + personalHours} hour(s)
                         </div>
                     </div>
+                    <h1>Time Off Request Hisotry</h1>
                     <div className="request-history-container">
+                        <div className="sick">
+                            <div className="date">
 
+                            </div>
+                            <div className="taken">
+
+                            </div>
+                            <div className="status">
+
+                            </div>
+                        </div>
+                        <div className="vacation">
+                            <div className="date">
+
+                            </div>
+                            <div className="taken">
+
+                            </div>
+                            <div className="status">
+
+                            </div>
+                        </div>
+                        <div className="non-work">
+                            <div className="date">
+
+                            </div>
+                            <div className="taken">
+
+                            </div>
+                            <div className="status">
+
+                            </div>
+                        </div>
+                        <div className="personal">
+                            <div className="date">
+
+                            </div>
+                            <div className="taken">
+
+                            </div>
+                            <div className="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
