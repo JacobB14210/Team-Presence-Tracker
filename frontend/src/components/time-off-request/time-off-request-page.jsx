@@ -18,6 +18,8 @@ export function Time() {
     const [nonWorkHours, setNonWorkHours] = useState(0);
     const [personalHours, setPersonalHours] = useState(0);
 
+    const [history, setHistory] = useState([]);
+
     const [message, setMessage] = useState("");
 
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -67,11 +69,16 @@ export function Time() {
                 const data = await response.json();
 
                 if (data.success) {
-                    console.log(data.requests);
+                    setHistory(data.requests);
+                }
+                else {
+                    setHistory([]);
                 }
             }
             catch (error) {
+                console.error("Error getting request history:", error);
 
+                setHistory([]);
             }
             
         }
@@ -79,6 +86,22 @@ export function Time() {
         handleRequestHistory();
         handleHoursBalance();
     }, []);
+
+    const sickRequests = history.filter(
+        (request) => request.reason === "sick"
+    );
+
+    const vacationRequests = history.filter(
+        (request) => request.reason === "vacation"
+    );
+
+    const nonWorkRequests = history.filter(
+        (request) => request.reason === "non-work"
+    );
+
+    const personalRequests = history.filter(
+        (request) => request.reason === "personal"
+    );
 
     const handleRequestOff = async (e) => {
         e.preventDefault();
@@ -233,50 +256,60 @@ export function Time() {
                             Personal:{" " + personalHours} hour(s)
                         </div>
                     </div>
-                    <h1>Time Off Request Hisotry</h1>
+
+                    <h1>Time Off Request History</h1>
                     <div className="request-history-container">
-                        <div className="sick">
-                            <div className="date">
-
+                        <div className="history-group1">
+                            <div className="sick">
+                                <h3>Sick</h3>
+                                {sickRequests.map((request) => (
+                                    <div key={request.id} className="request">
+                                        <div className="date">
+                                            {new Date(request.start_date).toISOString().split("T")[0]}
+                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
+                                            {": "}{request.status}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="taken">
-
-                            </div>
-                            <div className="status">
-
-                            </div>
-                        </div>
-                        <div className="vacation">
-                            <div className="date">
-
-                            </div>
-                            <div className="taken">
-
-                            </div>
-                            <div className="status">
-
-                            </div>
-                        </div>
-                        <div className="non-work">
-                            <div className="date">
-
-                            </div>
-                            <div className="taken">
-
-                            </div>
-                            <div className="status">
-
+                            <div className="vacation">
+                                <h3>Vacation</h3>
+                                {vacationRequests.map((request) => (
+                                    <div key={request.id} className="request">
+                                        <div className="date">
+                                            {new Date(request.start_date).toISOString().split("T")[0]}
+                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
+                                            {": "}{request.status}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                        <div className="personal">
-                            <div className="date">
 
+                        <div className="history-group2">
+                            <div className="non-work">
+                                <h3>Non-Work</h3>
+                                {nonWorkRequests.map((request) => (
+                                    <div key={request.id} className="request">
+                                        <div className="date">
+                                            {new Date(request.start_date).toISOString().split("T")[0]}
+                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
+                                            {": "}{request.status}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="taken">
-
-                            </div>
-                            <div className="status">
-
+                            <div className="personal">
+                                <h3>Personal</h3>
+                                {personalRequests.map((request) => (
+                                    <div key={request.id} className="request">
+                                        <div className="date">
+                                            {new Date(request.start_date).toISOString().split("T")[0]}
+                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
+                                            {": "}{request.status}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>

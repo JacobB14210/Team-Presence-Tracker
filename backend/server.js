@@ -382,6 +382,7 @@ app.get("/user-time-off", authenticateToken, (req, res) => {
 
     const getAllUsersTimeOff =`
         SELECT
+            time_off.id,
             time_off.start_date,
             time_off.end_date,
             time_off.status,

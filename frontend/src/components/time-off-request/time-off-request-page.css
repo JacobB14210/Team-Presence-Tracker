@@ -97,3 +97,38 @@
 
     padding: 5px;
 }
+
+.request-history-container {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 25px;
+
+    width: 100%;
+}
+
+.history-group1,
+.history-group2 {
+    display: contents;
+}
+
+.sick,
+.vacation,
+.non-work,
+.personal {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.sick h3,
+.vacation h3,
+.non-work h3,
+.personal h3 {
+    margin: 0;
+    padding: 0;
+}
