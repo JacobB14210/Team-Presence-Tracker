@@ -315,8 +315,6 @@ export function Time() {
                     </div>
                 </div>
             </div>
-
-            
         </div>
     );
 }
