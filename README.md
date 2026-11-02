@@ -3,7 +3,7 @@
 # Start Servers
 
 - Run Database
-  - Run Win = R
+  - Win + R
   - services.mcs
   - Check for MYSQL
 
@@ -11,7 +11,7 @@
 
 ```
 cd frontend
-npm run dev
+npm run dev -- --host 0.0.0.0
 ```
 
 - Start Backend
@@ -21,3 +21,10 @@ node server.js
 ```
 
 # Possible Errors and Fix
+
+- Google Authentication (Access Blocked: Authorization Error)
+  - Create District Domain
+  - Go to API & Services -> Clients -> Client IDs
+  - Add Login URL to Authroized JavaScript Origins
+- API Errors
+  - Ensure env variables have correct IPv4 address and ports
