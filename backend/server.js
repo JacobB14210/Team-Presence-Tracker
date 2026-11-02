@@ -10,9 +10,23 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.NETWORK_FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL
+    origin: function (origin, callback) {
+        // Allow requests without an Origin header,
+        // such as certain server-to-server or local tools.
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error("Not allowed by CORS"));
+    }
 }));
+
 app.use(express.json());
 
 const { OAuth2Client } = require("google-auth-library");
