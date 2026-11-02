@@ -20,6 +20,24 @@ cd backend
 node server.js
 ```
 
+# Implemented Features
+- Create Account
+  - Account creation using full name, email, and password
+- Login
+  - Login manually using credentials
+  - Login using google
+- Calendar
+  - Displays approved time off requests from users for selected day
+- Approve (Admin)
+  - Admin can approve or deny time off requests
+- Accounts (Admin)
+  - Displays employee accounts and amount of hours they have
+  - Can change the hours for that employee's account
+- Time Off Request
+  - Submit a time off request includeing start/end date, leave/return time, and reason
+  - Displays hours balance for your account
+  - Displays the history and status of time off requests submited
+
 # Possible Errors and Fix
 
 - Google Authentication (Access Blocked: Authorization Error)
