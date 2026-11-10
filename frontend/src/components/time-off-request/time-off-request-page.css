@@ -33,6 +33,10 @@
     outline: none;
 }
 
+.input-total-hours {
+    width: 50px;
+}
+
 .time-off-request-container select {
     border: 2px solid #10069F;
     border-radius: 10px;

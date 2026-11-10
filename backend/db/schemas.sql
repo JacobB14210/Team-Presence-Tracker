@@ -24,5 +24,6 @@ CREATE TABLE IF NOT EXISTS time_off (
     return_late BOOLEAN DEFAULT FALSE,
     leave_time TIME NULL,
     return_time TIME NULL,
+    total_hours INT DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

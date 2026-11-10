@@ -12,6 +12,7 @@ export function Time() {
     const [returnLate, setReturnLate] = useState(false);
     const [leaveTime, setLeaveTime] = useState("");
     const [returnTime, setReturnTime] = useState("");
+    const [usedHours, setUsedHours] = useState("");
 
     const [sickHours, setSickHours] = useState(0);
     const [vacationHours, setVacationHours] = useState(0);
@@ -143,7 +144,8 @@ export function Time() {
                     leaveEarly,
                     returnLate,
                     leaveTime,
-                    returnTime
+                    returnTime,
+                    usedHours
                 })
             }
         );
@@ -160,6 +162,7 @@ export function Time() {
             setReturnLate(false);
             setLeaveTime("");
             setReturnTime("");
+            setUsedHours(0);
         }
 
         setMessage(data.message);
@@ -231,6 +234,17 @@ export function Time() {
                             <option value="personal">Personal</option>
                             <option value="non-work">Non-work</option>
                         </select>
+                    </div>
+
+                    <div className="center">
+                        <label>Total Hours</label>
+                        <input
+                            className="input-total-hours"
+                            type="number"
+                            placeholder="Hours"
+                            value={usedHours}
+                            onChange={(e) =>
+                                setUsedHours(e.target.value)}/>
                     </div>
                     
                     <button type="submit" className="submit-button">
