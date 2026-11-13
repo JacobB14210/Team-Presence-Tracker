@@ -97,7 +97,7 @@ export function Time() {
     );
 
     const nonWorkRequests = history.filter(
-        (request) => request.reason === "non-work"
+        (request) => request.reason === "non_work"
     );
 
     const personalRequests = history.filter(
@@ -232,7 +232,7 @@ export function Time() {
                             <option value="sick">Sick</option>
                             <option value="vacation">Vacation</option>
                             <option value="personal">Personal</option>
-                            <option value="non-work">Non-work</option>
+                            <option value="non_work">Non-work</option>
                         </select>
                     </div>
 

@@ -85,7 +85,7 @@ export function Accounts() {
                 <h2>Employee Accounts</h2>
                 <p>{message}</p>
                 <div className="account-container">
-                    {users.length ===0 ? (
+                    {users.length === 0 ? (
                         <p>
                             No accounts
                         </p>
@@ -103,9 +103,7 @@ export function Accounts() {
                                         value={user.sick}
                                         onChange={e =>
                                             handleHoursChange(
-                                                user.id, "sick", e.target.value
-                                            )
-                                        }/>
+                                                user.id, "sick", e.target.value)}/>
                                 </div>
                                 <div>
                                     Vacation:{" "}
@@ -114,9 +112,7 @@ export function Accounts() {
                                         value={user.vacation}
                                         onChange={e =>
                                             handleHoursChange(
-                                                user.id, "vacation", e.target.value
-                                            )
-                                        }/>
+                                                user.id, "vacation", e.target.value)}/>
                                 </div>
                                 <div>
                                     Personal:{" "}
@@ -125,9 +121,7 @@ export function Accounts() {
                                         value={user.personal}
                                         onChange={e =>
                                             handleHoursChange(
-                                                user.id, "personal", e.target.value
-                                            )
-                                        }/>
+                                                user.id, "personal", e.target.value)}/>
                                 </div>
                                 <div>
                                     Non-Work:{" "}
@@ -136,9 +130,7 @@ export function Accounts() {
                                         value={user.non_work}
                                         onChange={e =>
                                             handleHoursChange(
-                                                user.id, "non_work", e.target.value
-                                            )
-                                        }/>
+                                                user.id, "non_work", e.target.value)}/>
                                 </div>
 
                                 <button className="update-hours-button " onClick={() => updateHours(user)}>

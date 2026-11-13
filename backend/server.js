@@ -713,7 +713,7 @@ app.post("/create", async (req, res) => {
     });
 });
 
-async function subtractHours(hoursToSubtract, reason, userID) {
+async function checkEnoughHours(hoursToSubtract, reason, userID) {
     // Get the balance for this specific user
     const getUserHoursSQL = `
         SELECT
@@ -726,44 +726,76 @@ async function subtractHours(hoursToSubtract, reason, userID) {
             id = ?
     `;
 
-    db.query(getUserHoursSQL, [userID], (err, results) => {
-        if (err) {
-            console.error("Error getting user hours:", err);
+    return new Promise((resolve, reject) => {
+        db.query(getUserHoursSQL, [userID], (err, results) => {
+            if (err) {
+                console.error("Error getting user hours:", err);
 
-            return reject(err);
-        }
+                return reject(err);
+            }
 
-        if (results.length === 0) {
+            if (results.length === 0) {
+                return resolve({
+                    success: false,
+                    message: "User's hours not found"
+                });
+            }
+
+            const availableHours = results[0].availableHours;
+
+            // Check whether the user has enough hours
+            if (availableHours < hoursToSubtract) {
+                return resolve({
+                    success: false,
+                    message: "Not enough hours available"
+                });
+            }
+
             return resolve({
-                success: false,
-                message: "User's hours not found"
+                success: true,
+                availableHours: availableHours
             });
-        }
-
-        const availableHours = results[0].availableHours;
-
-        // Check whether the user has enough hours
-        if (availableHours < hoursToSubtract) {
-            return resolve({
-                success: false,
-                message: "Not enough hours available"
-            });
-        }
-
-        const newBalance = availableHours - hoursToSubtract
-
-        return resolve({
-            success: true,
-            balance: newBalance
         });
+
+    });
+}
+
+async function subtractHours(hoursToSubtract, reason, userID) {
+    const checkResults = await checkEnoughHours(hoursToSubtract, reason, userID);
+    const availableHours = checkResults.availableHours;
+
+    return new Promise((resolve, rejet) => {
+        // Check whether the user has enough hours
+        if (!checkResults.success) {
+            return resolve({
+                success: false,
+                message: checkResults.message
+            });
+        }
+        else {
+            const newBalance = availableHours - hoursToSubtract
+
+            return resolve({
+                success: true,
+                balance: newBalance
+            });
+        }
     });
 }
 
 // Post time off request from time off request page
 app.post("/request-off", authenticateToken, async (req, res) => {
+    const userID = req.user.id;
     const { startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime, usedHours } = req.body;
+    
+    const checkResults = await checkEnoughHours(usedHours, reason, userID);
 
-    const userID = req.user.id
+    if (!checkResults.success) {
+        return res.json({
+            success: false,
+            message: "You don't have enough hours"
+        });
+    }
 
     const insertTimeSQL = `
         INSERT INTO time_off
@@ -832,9 +864,9 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
 
         const subtractResults = await subtractHours(totalHours, reason, employeeID);
 
-        const newBalance = subtractResults.balance
-
         if (subtractResults.success) {
+            const newBalance = subtractResults.balance;
+            
             const updateBalanceSQL = `
                 UPDATE
                     users
@@ -844,7 +876,7 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
                     id = ?
             `;
 
-            db.query(updateBalanceSQL, [newBalance, userID], async(err, results) => {
+            db.query(updateBalanceSQL, [newBalance, employeeID], async(err, results) => {
                 if (err) {
                     console.error("Error updating hours for user: ", err);
 
