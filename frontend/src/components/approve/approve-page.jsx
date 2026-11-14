@@ -130,11 +130,11 @@ export function Approve() {
                                     <ul>
                                         <li>
                                             {"From: "}{new Date(pending.start_date).toISOString().split("T")[0]}
-                                            {pending.leave_early ? ` -- ${pending.leave_time}` : ""}
+                                            {pending.leave_early ? ` at ${pending.leave_time}` : ""}
                                         </li>
                                         <li>
                                             {"To: "}{new Date(pending.end_date).toISOString().split("T")[0]}
-                                            {pending.return_late ? ` -- ${pending.return_time}` : ""}
+                                            {pending.return_late ? ` at ${pending.return_time}` : ""}
                                         </li>
                                     </ul>
                                 </div>

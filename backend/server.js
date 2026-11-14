@@ -940,7 +940,7 @@ app.post("/deny-request", authenticateToken, requireAdmin, (req, res) => {
         UPDATE
             time_off
         SET
-            status = 'deny'
+            status = 'denied'
         WHERE id = ?
     `;
 
