@@ -7,6 +7,8 @@ export function Approve() {
     const [pendings, setPendings] = useState([]);
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
+    const [message, setMessage] = useState("");
+
     // Run when browser runs
     useEffect(() => {
         const getAllPendingRequests = async () => {
@@ -64,11 +66,11 @@ export function Approve() {
                 );
             }
             else {
-                console.error("Failed to approve request:", data.message);
+                setMessage("Failed to approve request: " + data.message);
             }
         }
         catch (error) {
-            console.error("Error approving request:", error);
+            setMessage("Error approving request: " + error);
         }
     };
 
@@ -114,6 +116,7 @@ export function Approve() {
             <h1>Approve</h1>
             <div className="pending-requests-container">
                 <h2>Pending Time Off Requests</h2>
+                <p>{message}</p>
                 <div className="requests-list">
                     {pendings.length === 0 ? (
                         <p>
@@ -126,7 +129,7 @@ export function Approve() {
                                     <strong>
                                         {index + 1}. {pending.name}:
                                     </strong>{" "}
-                                    {pending.reason}
+                                    {pending.reason === "Non_work" ? "Non-work" : pending.reason}
                                     <ul>
                                         <li>
                                             {"From: "}{new Date(pending.start_date).toISOString().split("T")[0]}
@@ -135,6 +138,9 @@ export function Approve() {
                                         <li>
                                             {"To: "}{new Date(pending.end_date).toISOString().split("T")[0]}
                                             {pending.return_late ? ` at ${pending.return_time}` : ""}
+                                        </li>
+                                        <li>
+                                            {`Total Hours: ${pending.total_hours}`}
                                         </li>
                                     </ul>
                                 </div>

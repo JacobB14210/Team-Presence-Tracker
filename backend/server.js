@@ -400,7 +400,12 @@ app.get("/user-time-off", authenticateToken, (req, res) => {
             time_off.start_date,
             time_off.end_date,
             time_off.status,
-            time_off.reason
+            time_off.reason,
+            time_off.leave_early,
+            time_off.return_late,
+            time_off.leave_time,
+            time_off.return_time,
+            time_off.total_hours
         FROM
             time_off
         WHERE
@@ -439,11 +444,12 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
             time_off.leave_early,
             time_off.return_late,
             time_off.leave_time,
-            time_off.return_time
+            time_off.return_time,
+            time_off.total_hours
         FROM time_off
         JOIN users
             ON time_off.user_id = users.id
-        WHERE status = 'pending'
+        WHERE status = 'Pending'
     `;
 
     db.query(getAllPendingSQL, (err, results) => {
@@ -899,7 +905,7 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
                     UPDATE
                         time_off
                     SET
-                        status = 'approved'
+                        status = 'Approved'
                     WHERE
                         id = ?
                 `;
@@ -940,7 +946,7 @@ app.post("/deny-request", authenticateToken, requireAdmin, (req, res) => {
         UPDATE
             time_off
         SET
-            status = 'denied'
+            status = 'Denied'
         WHERE id = ?
     `;
 

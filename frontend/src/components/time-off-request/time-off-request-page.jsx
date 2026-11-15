@@ -88,22 +88,6 @@ export function Time() {
         handleHoursBalance();
     }, []);
 
-    const sickRequests = history.filter(
-        (request) => request.reason === "sick"
-    );
-
-    const vacationRequests = history.filter(
-        (request) => request.reason === "vacation"
-    );
-
-    const nonWorkRequests = history.filter(
-        (request) => request.reason === "non_work"
-    );
-
-    const personalRequests = history.filter(
-        (request) => request.reason === "personal"
-    );
-
     const handleRequestOff = async (e) => {
         e.preventDefault();
 
@@ -229,10 +213,10 @@ export function Time() {
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}>
                             <option value="" disabled>Select an option</option>
-                            <option value="sick">Sick</option>
-                            <option value="vacation">Vacation</option>
-                            <option value="personal">Personal</option>
-                            <option value="non_work">Non-work</option>
+                            <option value="Sick">Sick</option>
+                            <option value="Vacation">Vacation</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Non_work">Non-work</option>
                         </select>
                     </div>
 
@@ -273,59 +257,21 @@ export function Time() {
 
                     <h1>Time Off Request History</h1>
                     <div className="request-history-container">
-                        <div className="history-group1">
-                            <div className="sick">
-                                <h3>Sick</h3>
-                                {sickRequests.map((request) => (
-                                    <div key={request.id} className="request">
-                                        <div className="date">
-                                            {new Date(request.start_date).toISOString().split("T")[0]}
-                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
-                                            {": "}{request.status}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="vacation">
-                                <h3>Vacation</h3>
-                                {vacationRequests.map((request) => (
-                                    <div key={request.id} className="request">
-                                        <div className="date">
-                                            {new Date(request.start_date).toISOString().split("T")[0]}
-                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
-                                            {": "}{request.status}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        {history.map((request) => (
+                            <div key={request.id} className="request">
+                                {request.reason === "Non_work" ? "Non-work" : request.reason}{": "}
 
-                        <div className="history-group2">
-                            <div className="non-work">
-                                <h3>Non-Work</h3>
-                                {nonWorkRequests.map((request) => (
-                                    <div key={request.id} className="request">
-                                        <div className="date">
-                                            {new Date(request.start_date).toISOString().split("T")[0]}
-                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
-                                            {": "}{request.status}
-                                        </div>
-                                    </div>
-                                ))}
+                                {" -- From: "}{new Date(request.start_date).toISOString().split("T")[0]}{" "}
+                                {request.leave_early ? ` at ${request.leave_time}`: ""}
+
+                                {" -- To: "}{new Date(request.end_date).toISOString().split("T")[0]}
+                                {request.return_late ? ` at ${request.return_time}` : ""}{" "}
+
+                                {` -- Status: ${request.status}`}{" "}
+                                
+                                {` -- Hours: ${request.total_hours}`}
                             </div>
-                            <div className="personal">
-                                <h3>Personal</h3>
-                                {personalRequests.map((request) => (
-                                    <div key={request.id} className="request">
-                                        <div className="date">
-                                            {new Date(request.start_date).toISOString().split("T")[0]}
-                                            {" "}- {new Date(request.end_date).toISOString().split("T")[0]}
-                                            {": "}{request.status}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>

@@ -105,36 +105,25 @@
 }
 
 .request-history-container {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: start;
-    gap: 25px;
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
 
     width: 100%;
 }
 
-.history-group1,
-.history-group2 {
-    display: contents;
-}
+.request-history-container .request {
+    color: #000000;
+    border: 2px solid #10069F;
+    border-radius: 10px;
 
-.sick,
-.vacation,
-.non-work,
-.personal {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 10px;
-
+    box-sizing: border-box;
+    text-align: center;
+    width: 100%;
     min-width: 0;
-}
 
-.sick h3,
-.vacation h3,
-.non-work h3,
-.personal h3 {
-    margin: 0;
-    padding: 0;
+    flex-shrink: 0;
+
+    padding: 10px;
 }
