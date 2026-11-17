@@ -64,6 +64,8 @@ export function Approve() {
                         (pending) => pending.id !== requestId
                     )
                 );
+
+                setMessage(data.message);
             }
             else {
                 setMessage("Failed to approve request: " + data.message);
@@ -133,11 +135,11 @@ export function Approve() {
                                     <ul>
                                         <li>
                                             {"From: "}{new Date(pending.start_date).toISOString().split("T")[0]}
-                                            {pending.leave_early ? ` at ${pending.leave_time}` : ""}
+                                            {pending.leave_early ? ` at ${pending.leave_time.slice(0, 5)}` : ""}
                                         </li>
                                         <li>
                                             {"To: "}{new Date(pending.end_date).toISOString().split("T")[0]}
-                                            {pending.return_late ? ` at ${pending.return_time}` : ""}
+                                            {pending.return_late ? ` at ${pending.return_time.slice(0, 5)}` : ""}
                                         </li>
                                         <li>
                                             {`Total Hours: ${pending.total_hours}`}

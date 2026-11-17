@@ -766,7 +766,7 @@ async function checkEnoughHours(hoursToSubtract, reason, userID) {
     });
 }
 
-async function subtractHours(hoursToSubtract, reason, userID) {
+async function getNewBalance(hoursToSubtract, reason, userID) {
     const checkResults = await checkEnoughHours(hoursToSubtract, reason, userID);
     const availableHours = checkResults.availableHours;
 
@@ -789,6 +789,64 @@ async function subtractHours(hoursToSubtract, reason, userID) {
     });
 }
 
+async function subtractHours(userID, requestID, newBalance, reason) {
+    const updateBalanceSQL = `
+        UPDATE
+            users
+        SET
+            ${reason} = ?
+        WHERE
+            id = ?
+    `;
+
+    db.query(updateBalanceSQL, [newBalance, userID], async(err, results) => {
+        if (err) {
+            console.error("Error updating hours for user: ", err);
+
+            return res.status(500).json({
+                success: false,
+                message: "Error updating hours for user"
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Could not find total hours for request"
+            });
+        }
+
+        console.log("Successfully subtracted hours from user");
+
+        const approveRequestSQL = `
+            UPDATE
+                time_off
+            SET
+                status = 'Approved'
+            WHERE
+                id = ?
+        `;
+
+        db.query(approveRequestSQL, [id], (err, results) => {
+            if (err) {
+                console.error("Error changing status of request: ", err);
+
+                return res.status(500).json({
+                    success: false,
+                    message: "Failed to change status of request"
+                });
+            }
+
+            console.log("Changed status of time off request to approve");
+
+            return res.json({
+                success: true,
+                message: "Changed status of time off request to approve"
+            });
+        });
+    });
+}
+
 // Post time off request from time off request page
 app.post("/request-off", authenticateToken, async (req, res) => {
     const userID = req.user.id;
@@ -805,12 +863,12 @@ app.post("/request-off", authenticateToken, async (req, res) => {
 
     const insertTimeSQL = `
         INSERT INTO time_off
-            (user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time, total_hours)
+            (status, user_id, start_date, end_date, reason, leave_early, return_late, leave_time, return_time, total_hours)
         VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(insertTimeSQL, [userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null, usedHours],
+    db.query(insertTimeSQL, [reason === "Sick" ? "Approved" : "Pending", userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null, usedHours],
         (err, results) => {
             if (err) {
                 console.error("Error creating time off request:", err);
@@ -819,6 +877,23 @@ app.post("/request-off", authenticateToken, async (req, res) => {
                     success: false,
                     message: "Failed to create time off request"
                 });
+            }
+
+            if (reason == "Sick") {
+                const subtractResults = subtractHours(userID, usedHours, reason);
+
+                if (subtractResults.success) {
+                    return res.json({
+                        success: true,
+                        message: subtractResults.message
+                    });
+                }
+                else {
+                    return res.json({
+                        success: false,
+                        message: subtractResults.message
+                    });
+                }
             }
 
             console.log("Created a new time off request");
@@ -837,6 +912,7 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
 
     const getRequestHoursSQL = `
         SELECT
+            id,
             total_hours,
             reason,
             user_id
@@ -864,76 +940,29 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
         }
 
         console.log(results);
+        const requestID = results[0].id;
         const totalHours = results[0].total_hours;
         const reason = results[0].reason;
         const employeeID = results[0].user_id;
 
-        const subtractResults = await subtractHours(totalHours, reason, employeeID);
+        const newBalanceResults = await getNewBalance(totalHours, reason, employeeID);
 
-        if (subtractResults.success) {
-            const newBalance = subtractResults.balance;
-            
-            const updateBalanceSQL = `
-                UPDATE
-                    users
-                SET
-                    ${reason} = ?
-                WHERE
-                    id = ?
-            `;
+        if (newBalanceResults.success) {
+            console.log("Calculated new balance");
+            const subtractResults = subtractHours(employeeID, requestID, newBalanceResults.balance, reason);
 
-            db.query(updateBalanceSQL, [newBalance, employeeID], async(err, results) => {
-                if (err) {
-                    console.error("Error updating hours for user: ", err);
-
-                    return res.status(500).json({
-                        success: false,
-                        message: "Error updating hours for user"
-                    });
-                }
-
-                if (results.length === 0) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Could not find total hours for request"
-                    });
-                }
-
-                console.log("Successfully subtracted hours from user");
-
-                const approveRequestSQL = `
-                    UPDATE
-                        time_off
-                    SET
-                        status = 'Approved'
-                    WHERE
-                        id = ?
-                `;
-
-                db.query(approveRequestSQL, [id], (err, results) => {
-                    if (err) {
-                        console.error("Error changing status of request: ", err);
-
-                        return res.status(500).json({
-                            success: false,
-                            message: "Failed to change status of request"
-                        });
-                    }
-
-                    console.log("Changed status of time off request to approve");
-
-                    return res.json({
-                        success: true,
-                        message: "Changed status of time off request to approve"
-                    });
+            if (subtractResults.success) {
+                return res.json({
+                    success: true,
+                    message: subtractResults.message
                 });
-            });
-        }
-        else { // Return any error from subtractHours function
-            return res.json({
-                success: false,
-                message: subtractResults.message
-            })
+            }
+            else {
+                return res.json({
+                    success: false,
+                    message: subtractResults.message
+                });
+            }
         }
     });
 });

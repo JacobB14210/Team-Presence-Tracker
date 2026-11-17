@@ -139,7 +139,7 @@ export function Calendar() {
                                             new Date(request.start_date).toISOString().split("T")[0] === date.toString() ? (
                                             <span>
                                                 {" "}-- Leaves early: {" "}
-                                                {request.leave_time}
+                                                {request.leave_time.slice(0, 5)}
                                             </span>
                                         ) : (
                                             <span>
@@ -151,7 +151,7 @@ export function Calendar() {
                                             new Date(request.end_date).toISOString().split("T")[0] == date.toString() ? (
                                             <span>
                                                 {" "}-- Returns late: {" "}
-                                                {request.return_time}
+                                                {request.return_time.slice(0, 5)}
                                             </span>
                                         ): (
                                             <span>

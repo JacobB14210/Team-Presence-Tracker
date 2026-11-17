@@ -257,21 +257,34 @@ export function Time() {
 
                     <h1>Time Off Request History</h1>
                     <div className="request-history-container">
-                        {history.map((request) => (
-                            <div key={request.id} className="request">
-                                {request.reason === "Non_work" ? "Non-work" : request.reason}{": "}
-
-                                {" -- From: "}{new Date(request.start_date).toISOString().split("T")[0]}{" "}
-                                {request.leave_early ? ` at ${request.leave_time}`: ""}
-
-                                {" -- To: "}{new Date(request.end_date).toISOString().split("T")[0]}
-                                {request.return_late ? ` at ${request.return_time}` : ""}{" "}
-
-                                {` -- Status: ${request.status}`}{" "}
-                                
-                                {` -- Hours: ${request.total_hours}`}
-                            </div>
-                        ))}
+                        <table>
+                            <tr>
+                                <th>Reason</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Status</th>
+                                <th>Total Hours</th>
+                            </tr>
+                            {history.map((request) => (
+                                <tr key={request.id} className="request">
+                                    <td>{request.reason == "Non_work" ? "Non-work" : request.reason}</td>
+                                    <td>
+                                        {new Date(request.start_date).toISOString().split("T")[0]}{" "}
+                                        {request.return_late ? `${request.leave_time.slice(0, 5)}` : ""}{" "}
+                                    </td>
+                                    <td>
+                                        {new Date(request.end_date).toISOString().split("T")[0]}{" "}
+                                        {request.return_late ? `${request.return_time.slice(0, 5)}` : ""}{" "}
+                                    </td>
+                                    <td>
+                                        {request.status}
+                                    </td>
+                                    <td>
+                                        {request.total_hours}
+                                    </td>
+                                </tr>
+                            ))}
+                        </table>
                     </div>
                 </div>
             </div>
