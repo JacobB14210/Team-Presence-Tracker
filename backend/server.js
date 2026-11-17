@@ -817,6 +817,7 @@ async function subtractHours(userID, newBalance, reason) {
     });
 }
 
+// TODO: Fix if request has a sick reason
 // Post time off request from time off request page
 app.post("/request-off", authenticateToken, async (req, res) => {
     const userID = req.user.id;
