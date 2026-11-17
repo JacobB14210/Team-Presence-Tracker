@@ -768,28 +768,24 @@ async function checkEnoughHours(hoursToSubtract, reason, userID) {
 
 async function getNewBalance(hoursToSubtract, reason, userID) {
     const checkResults = await checkEnoughHours(hoursToSubtract, reason, userID);
+
+    if (!checkResults.success) {
+        return {
+            success: false,
+            message: checkResults.message
+        };
+    }
+
     const availableHours = checkResults.availableHours;
+    const newBalance = availableHours - hoursToSubtract;
 
-    return new Promise((resolve, rejet) => {
-        // Check whether the user has enough hours
-        if (!checkResults.success) {
-            return resolve({
-                success: false,
-                message: checkResults.message
-            });
-        }
-        else {
-            const newBalance = availableHours - hoursToSubtract
-
-            return resolve({
-                success: true,
-                balance: newBalance
-            });
-        }
-    });
+    return {
+        success: true,
+        balance: newBalance
+    };
 }
 
-async function subtractHours(userID, requestID, newBalance, reason) {
+async function subtractHours(userID, newBalance, reason) {
     const updateBalanceSQL = `
         UPDATE
             users
@@ -799,49 +795,23 @@ async function subtractHours(userID, requestID, newBalance, reason) {
             id = ?
     `;
 
-    db.query(updateBalanceSQL, [newBalance, userID], async(err, results) => {
-        if (err) {
-            console.error("Error updating hours for user: ", err);
-
-            return res.status(500).json({
-                success: false,
-                message: "Error updating hours for user"
-            });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Could not find total hours for request"
-            });
-        }
-
-        console.log("Successfully subtracted hours from user");
-
-        const approveRequestSQL = `
-            UPDATE
-                time_off
-            SET
-                status = 'Approved'
-            WHERE
-                id = ?
-        `;
-
-        db.query(approveRequestSQL, [id], (err, results) => {
+    return new Promise((resolve, reject) => {
+        db.query(updateBalanceSQL, [newBalance, userID], (err, results) => {
             if (err) {
-                console.error("Error changing status of request: ", err);
+                console.error("Error updating hours:", err);
+                return reject(err);
+            }
 
-                return res.status(500).json({
+            if (results.affectedRows === 0) {
+                return resolve({
                     success: false,
-                    message: "Failed to change status of request"
+                    message: "Could not find user to update"
                 });
             }
 
-            console.log("Changed status of time off request to approve");
-
-            return res.json({
+            return resolve({
                 success: true,
-                message: "Changed status of time off request to approve"
+                message: "Successfully subtracted hours from user"
             });
         });
     });
@@ -915,7 +885,8 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
             id,
             total_hours,
             reason,
-            user_id
+            user_id,
+            status
         FROM
             time_off
         WHERE
@@ -945,24 +916,74 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
         const reason = results[0].reason;
         const employeeID = results[0].user_id;
 
-        const newBalanceResults = await getNewBalance(totalHours, reason, employeeID);
+        if (results[0].status !== "Pending") {
+            return res.status(400).json({
+                success: false,
+                message: "This request has already been processed"
+            });
+        }
 
-        if (newBalanceResults.success) {
-            console.log("Calculated new balance");
-            const subtractResults = subtractHours(employeeID, requestID, newBalanceResults.balance, reason);
+        try {
+            const newBalanceResults = await getNewBalance(totalHours, reason, employeeID);
 
-            if (subtractResults.success) {
-                return res.json({
-                    success: true,
-                    message: subtractResults.message
-                });
+            if (newBalanceResults.success) {
+                console.log("Calculated new balance");
+                const subtractResults = await subtractHours(employeeID, newBalanceResults.balance, reason);
+
+                if (subtractResults.success) {
+                    const approveRequestSQL = `
+                        UPDATE
+                            time_off
+                        SET
+                            status = 'Approved'
+                        WHERE
+                            id = ?
+                    `;
+
+                    db.query(approveRequestSQL, [requestID], (err, results) => {
+                        if (err) {
+                            console.error("Error approving request:", err);
+                            
+                            return res.json({
+                                success: false,
+                                message: "Error approving request"
+                            })
+                        }
+
+                        if (results.affectedRows === 0) {
+                            return results.json({
+                                success: false,
+                                message: "Could not find request to approve"
+                            });
+                        }
+
+                        return res.json({
+                            success: true,
+                            message: "Successfully approved time-off request"
+                        });
+                    });
+                }
+                else {
+                    return res.json({
+                        success: false,
+                        message: subtractResults.message
+                    });
+                }
             }
             else {
-                return res.json({
+                return res.status(400).json({
                     success: false,
-                    message: subtractResults.message
+                    message: newBalanceResults.message
                 });
             }
+        }
+        catch (error) {
+            console.error("Error processing approval:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "An error occurred while approving the request"
+            });
         }
     });
 });
