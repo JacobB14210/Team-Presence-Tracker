@@ -258,32 +258,36 @@ export function Time() {
                     <h1>Time Off Request History</h1>
                     <div className="request-history-container">
                         <table>
-                            <tr>
-                                <th>Reason</th>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Status</th>
-                                <th>Total Hours</th>
-                            </tr>
-                            {history.map((request) => (
-                                <tr key={request.id} className="request">
-                                    <td>{request.reason == "Non_work" ? "Non-work" : request.reason}</td>
-                                    <td>
-                                        {new Date(request.start_date).toISOString().split("T")[0]}{" "}
-                                        {request.return_late ? `${request.leave_time.slice(0, 5)}` : ""}{" "}
-                                    </td>
-                                    <td>
-                                        {new Date(request.end_date).toISOString().split("T")[0]}{" "}
-                                        {request.return_late ? `${request.return_time.slice(0, 5)}` : ""}{" "}
-                                    </td>
-                                    <td>
-                                        {request.status}
-                                    </td>
-                                    <td>
-                                        {request.total_hours}
-                                    </td>
+                            <thead>
+                                <tr>
+                                    <th>Reason</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Status</th>
+                                    <th>Total Hours</th>
                                 </tr>
-                            ))}
+                            </thead>
+                            <tbody>
+                                {history.map((request) => (
+                                    <tr key={request.id} className="request">
+                                        <td>{request.reason == "Non_work" ? "Non-work" : request.reason}</td>
+                                        <td>
+                                            {new Date(request.start_date).toISOString().split("T")[0]}{" "}
+                                            {request.leave_early ? `${request.leave_time.slice(0, 5)}` : ""}{" "}
+                                        </td>
+                                        <td>
+                                            {new Date(request.end_date).toISOString().split("T")[0]}{" "}
+                                            {request.return_late ? `${request.return_time.slice(0, 5)}` : ""}{" "}
+                                        </td>
+                                        <td>
+                                            {request.status}
+                                        </td>
+                                        <td>
+                                            {request.total_hours}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
                         </table>
                     </div>
                 </div>
