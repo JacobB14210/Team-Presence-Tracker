@@ -133,7 +133,7 @@ export function Calendar() {
                                         <strong>
                                             {request.name}:
                                         </strong>{" "}
-                                        {request.reason}
+                                        {request.reason == "Non_work" ? "Non-work" : request.reason}
 
                                         {request.leave_early && 
                                             new Date(request.start_date).toISOString().split("T")[0] === date.toString() ? (

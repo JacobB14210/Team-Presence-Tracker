@@ -831,6 +831,22 @@ app.post("/request-off", authenticateToken, async (req, res) => {
             message: "You don't have enough hours"
         });
     }
+    
+    let newBalance;
+
+    if (reason === "Sick") {
+
+        const newBalanceResults = await getNewBalance(usedHours, reason, userID);
+
+        if (!newBalanceResults.success) {
+            return res.json({
+                success: false,
+                message: newBalanceResults.message
+            });
+        }
+
+        newBalance = newBalanceResults.balance;
+    }
 
     const insertTimeSQL = `
         INSERT INTO time_off
@@ -840,7 +856,7 @@ app.post("/request-off", authenticateToken, async (req, res) => {
     `;
 
     db.query(insertTimeSQL, [reason === "Sick" ? "Approved" : "Pending", userID, startDate, endDate, reason, leaveEarly, returnLate, leaveTime || null, returnTime || null, usedHours],
-        (err, results) => {
+        async (err, results) => {
             if (err) {
                 console.error("Error creating time off request:", err);
 
@@ -850,21 +866,21 @@ app.post("/request-off", authenticateToken, async (req, res) => {
                 });
             }
 
-            if (reason == "Sick") {
-                const subtractResults = subtractHours(userID, usedHours, reason);
+            // Automatically subtract hours for Sick requests
+            if (reason === "Sick") {
+                const subtractResults = await subtractHours(userID, newBalance, reason);
 
-                if (subtractResults.success) {
-                    return res.json({
-                        success: true,
-                        message: subtractResults.message
-                    });
-                }
-                else {
+                if (!subtractResults.success) {
                     return res.json({
                         success: false,
                         message: subtractResults.message
                     });
                 }
+
+                return res.json({
+                    success: true,
+                    message: "Sick request approved and hours subtracted"
+                });
             }
 
             console.log("Created a new time off request");
