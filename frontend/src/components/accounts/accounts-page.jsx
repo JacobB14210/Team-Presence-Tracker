@@ -68,7 +68,7 @@ export function Accounts() {
             setMessage("Failed to update hours");
         }
     };
-
+    // TODO: Finish decminal related formating
     return (
         <div className="accounts-container">
             <Dashboard />
