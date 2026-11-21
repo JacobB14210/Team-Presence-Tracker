@@ -232,7 +232,7 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-// Get a users hours
+// Get a user's hours
 app.get("/user-hours", authenticateToken, (req, res) => {
     const userID = req.user.id
 
@@ -275,7 +275,16 @@ app.get("/user-hours", authenticateToken, (req, res) => {
     })
 });
 
-// Get information from all users
+/**
+ * @route GET /all-users
+ * 
+ * @description Gets all employee information to display in Accounts page.
+ * 
+ * @middleware authenticateToken - Verifies the user's authentication token.
+ * @middleware requireAdmin - Ensures the authenticated user has administrator privileges.
+ * 
+ * @returns {Object} 500 - Internal server error while getting all users.
+ */
 app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
     const getAllUsersSQL = `
         SELECT
@@ -471,10 +480,27 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
     });
 });
 
-// Update hours for a user based on userID
+/**
+ * @route PUT /update-hours/:id
+ * 
+ * @description Updates and employee's availabel time off balance.
+ * 
+ * @middleware authenticateToken - Verifies the user's authentication token.
+ * @middleware requireAdmin - Ensures the authenticated user has administrator privileges.
+ * 
+ * @param {number} id - ID of the employee who's hours are being updated.
+ * 
+ * @body {number} sick - Updated sick hours.
+ * @body {number} vacation - Updated vacation hours.
+ * @body {number} non_work - Updated non-work hours.
+ * @body {number} personal - Updated personal hours.
+ * 
+ * @returns {Object} 400 - Invalid employee id or hour values.
+ * @returns {Object} 500 - Internal server error while updating hours.
+ */
 app.put("/update-hours/:id", authenticateToken, requireAdmin, async (req, res) => {
-    const userID = req.user.id
-    const { sick, vacation, personal, non_work } = req.body;
+    const userID = Number(req.params.id);
+    const { name, sick, vacation, non_work, personal } = req.body;
 
     // Validate employee ID
     if (!Number.isInteger(userID) || userID <= 0) {
@@ -529,7 +555,7 @@ app.put("/update-hours/:id", authenticateToken, requireAdmin, async (req, res) =
 
         res.json({
             success: true,
-            message: "Changed hours"
+            message: `Hours updated for ${name}`
         })
     });
 });
@@ -817,7 +843,6 @@ async function subtractHours(userID, newBalance, reason) {
     });
 }
 
-// TODO: Fix if request has a sick reason
 // Post time off request from time off request page
 app.post("/request-off", authenticateToken, async (req, res) => {
     const userID = req.user.id;
