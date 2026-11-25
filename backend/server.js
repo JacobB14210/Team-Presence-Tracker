@@ -560,7 +560,19 @@ app.put("/update-hours/:id", authenticateToken, requireAdmin, async (req, res) =
     });
 });
 
-// Post login from login page
+/**
+ * @route POST /login
+ * 
+ * @description Checks if login credentials entered match entries in the database.
+ * 
+ * @body {String} email - Email input.
+ * @body {String} password - Password input.
+ * 
+ * @returns {Object} 500 - Internal server error while logging in.
+ * @returns {Object} 404 - User does not exist in the database.
+ * @returns {Object} 403 - Incorrect email or password.
+ * @returns {Object} 200 - Correct email and passowrd.
+ */
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
@@ -579,9 +591,9 @@ app.post("/login", async (req, res) => {
         if (results.length === 0) { // Check if user exists in database
             console.log(`User does not exist for email: ${email}`);
 
-            return res.json({
+            return res.status(404).json({
                 success: false,
-                message: "Password or email is incorrect"
+                message: `User does not exist for email: ${email}`
             });
         }
 
@@ -606,7 +618,7 @@ app.post("/login", async (req, res) => {
 
             console.log(`Logged in and created JWT token for user ${email}`);
 
-            return res.json({
+            return res.status(200).json({
                 success: true,
                 token: token,
                 id: user.id,
@@ -616,23 +628,32 @@ app.post("/login", async (req, res) => {
             });
         }
 
-        return res.json({
+        return res.status(403).json({
             success: false,
             message: "Password or email is incorrect"
         });
     });
 });
 
-// Post for google login
+/**
+ * @route PUT /google-login
+ * 
+ * @description Checks if google login already exists in the database.
+ * 
+ * @body {token} - Credentials for the google login.
+ * 
+ * @returns {Object} 500 - Internal server error while logging in.
+ * @returns {Object} 404 - User does not exist in the database.
+ * @returns {Object} 200 - Google login is successfull.
+ */
 app.post("/google-login", async (req, res) => {
     const { token } = req.body;
 
     try {
-        const ticket =
-            await client.verifyIdToken({
-                idToken: token,
-                audience: CLIENTID,
-            });
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: CLIENTID,
+        });
 
         const payload = ticket.getPayload();
 
@@ -651,28 +672,28 @@ app.post("/google-login", async (req, res) => {
             }
 
             if (results.length === 0) { // Check if user exists in database
-                return res.json({
+                console.log("User does not exist for the email");
+                
+                return res.status(404).json({
                     success: false,
-                    message: "Password or email is incorrect"
+                    message: "User does not exist for the email"
                 });
             }
 
             const user = results[0];
 
-            const token = jwt.sign(
-                {
-                    id: user.id,
-                    role: user.emp_type
-                },
-                process.env.JWT_SECRET,
-                {
-                    expiresIn: "1h"
-                }
-            );
+            const token = jwt.sign({
+                id: user.id,
+                role: user.emp_type
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1h"
+            });
 
             console.log(`Logged in and created JWT token for user ${email}`);
 
-            return res.json({
+            return res.status(200).json({
                 token: token,
                 success: true,
                 id: user.id,
@@ -685,9 +706,9 @@ app.post("/google-login", async (req, res) => {
     catch (err) {
         console.error(err);
 
-        return res.status(401).json({
+        return res.status(500).json({
             success: false,
-            message: "Password or email is incorrect"
+            message: "Error logging in with google"
         });
     }
 });

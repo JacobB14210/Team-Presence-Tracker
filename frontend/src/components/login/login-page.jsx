@@ -13,7 +13,7 @@ export function Login() {
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
 
-    const handleLogin = async (e) => {
+    const handleLogin = async (e) => { // Attempt login with entered email and password
         e.preventDefault();
 
         const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, { // Handles login credentials
@@ -30,7 +30,7 @@ export function Login() {
 
         const data = await response.json();
 
-        if (data.success) {
+        if (response.status === 200) {
             const user = {
                 token: data.token,
                 id: data.id,
@@ -45,25 +45,25 @@ export function Login() {
             window.location.href = "/Calendar";
         }
         else {
-            setMessage("Invalid Email or Password");
+            setMessage(data.message);
         }
     };
     
-    const handleGoogleSuccess = async (credentialResponse) => {
+    const handleGoogleSuccess = async (credentialResponse) => { // Attempt google login with email
         const response = await fetch(`${import.meta.env.VITE_API_URL}/google-login`, { // Handles google login credentials
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    token: credentialResponse.credential
+                    token: credentialResponse.credential // Google crednetials
                 })
             }
         );
 
         const data = await response.json();
 
-        if (data.success) {
+        if (response.status === 200) {
             const user = {
                 token: data.token,
                 id: data.id,
@@ -94,15 +94,13 @@ export function Login() {
                     type="email"
                     placeholder="Email"
                     value={email}
-                    onChange={(e) =>
-                        setEmail(e.target.value)}/>
+                    onChange={(e) => setEmail(e.target.value)}/>
 
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) =>
-                        setPassword(e.target.value)}/>
+                    onChange={(e) => setPassword(e.target.value)}/>
 
                 <button type="submit" className="login-button">
                     Login
@@ -111,9 +109,7 @@ export function Login() {
 
             <GoogleLogin
                 onSuccess={handleGoogleSuccess}
-                onError={() => {
-                    setMessage("Login Failed")
-                }}
+                onError={() => {setMessage("Login Failed")}}
                 theme="filled_blue"
                 size="large"
                 shape="pill"
