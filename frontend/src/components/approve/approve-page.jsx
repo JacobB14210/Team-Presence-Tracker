@@ -20,7 +20,7 @@ export function Approve() {
 
                 const data = await response.json();
 
-                if (data.success) {
+                if (response.status === 200) {
                     setPendings(data.requests);
                 }
                 else {
@@ -56,7 +56,7 @@ export function Approve() {
 
             console.log(data);
 
-            if (data.success) {
+            if (response.status === 200) {
                 // Remove the approved request from the pending list
                 setPendings((currentPendings) =>
                     currentPendings.filter((pending) => pending.id !== requestId));
@@ -91,7 +91,7 @@ export function Approve() {
 
             console.log(data);
 
-            if (data.success) {
+            if (response.status === 200) {
                 // Remove the approved request from the pending list
                 setPendings((currentPendings) =>
                     currentPendings.filter(

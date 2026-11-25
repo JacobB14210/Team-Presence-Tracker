@@ -8,13 +8,13 @@ import "./calendar.css"
 export function Calendar() {
     const [date, setDate] = useState(today(getLocalTimeZone()));
     const [requests, setRequests] = useState([]);
-    const [calendarRequests, setCalendarRequests] = useState([]);
+    const [approvedRequests, setApprovedRequests] = useState([]);
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
     useEffect(() => {
         const getAllRequests = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/all-time-off`, { // Get all approved time off
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/all-approved`, { // Get all approved time off
                     headers: {
                         Authorization: `Bearer ${currentUser.token}`
                     }
@@ -22,17 +22,17 @@ export function Calendar() {
 
                 const data = await response.json();
 
-                if (data.success) {
-                    setCalendarRequests(data.requests);
+                if (response.status === 200) {
+                    setApprovedRequests(data.requests);
                 }
                 else {
-                    setCalendarRequests([]);
+                    setApprovedRequests([]);
                 }
             }
             catch (error) {
                 console.error("Error getting all time off requests: ", error);
 
-                setCalendarRequests([]);
+                setApprovedRequests([]);
             }
         };
 
@@ -44,7 +44,7 @@ export function Calendar() {
 
         const getRequest = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/time-off?date=${date}`, { // Get all requests for the selected day
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/date-approved?date=${date}`, { // Get all requests for the selected day
                     headers: {
                         Authorization: `Bearer ${currentUser.token}`
                     }
@@ -52,7 +52,7 @@ export function Calendar() {
 
                 const data = await response.json();
 
-                if (data.success) {
+                if (response.status === 200) {
                     setRequests(data.requests);
                 }
                 else {
@@ -70,18 +70,14 @@ export function Calendar() {
     
     }, [date]);
 
-    const hasRequest = (calendarDate) => {
+    const hasRequest = (calendarDate) => { // Checks list if date has request for calendar
 
         const dateString = calendarDate.toString();
 
-        return calendarRequests.some((request) => {
-            const startDate = new Date(request.start_date)
-                .toISOString()
-                .split("T")[0];
+        return approvedRequests.some((request) => {
+            const startDate = new Date(request.start_date).toISOString().split("T")[0];
 
-            const endDate = new Date(request.end_date)
-                .toISOString()
-                .split("T")[0];
+            const endDate = new Date(request.end_date).toISOString().split("T")[0];
 
             return dateString >= startDate && dateString <= endDate;
         });

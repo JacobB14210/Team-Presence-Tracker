@@ -284,6 +284,7 @@ app.get("/user-hours", authenticateToken, (req, res) => {
  * @middleware requireAdmin - Ensures the authenticated user has administrator privileges.
  * 
  * @returns {Object} 500 - Internal server error while getting all users.
+ * @returns {Object} 200 - Successfully returns data of all users for display.
  */
 app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
     const getAllUsersSQL = `
@@ -311,16 +312,25 @@ app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
 
         console.log("Retrieved all users");
 
-        res.json({
+        res.status(200).json({
             success: true,
             users: results
         });
     })
 });
 
-// Get approved time off for selected day
-app.get("/time-off", authenticateToken, (req, res) => {
-    const { date } = req.query;
+/**
+ * @route GET /date-approved
+ * 
+ * @description Retrieves all time off request information for selected date.
+ * 
+ * @query {date} date - Selected date to get time off request data.
+ * 
+ * @returns {Object} 500 - Internal server error getting approved time off for selected date.
+ * @returns {Object} 200 - Successfully retrieved all approved time off request for selected date.
+ */
+app.get("/date-approved", authenticateToken, (req, res) => {
+    const date = req.query.date;
 
     const getApprovedTimeOffDateSQL = `
         SELECT
@@ -353,15 +363,22 @@ app.get("/time-off", authenticateToken, (req, res) => {
 
         console.log(`Retrieved approved time off for ${date}`);
 
-        res.json({
+        res.status(200).json({
             success: true,
             requests: results
         });
     })
 });
 
-// Get all approved time off
-app.get("/all-time-off", authenticateToken, (req, res) => {
+/**
+ * @route GET /all-approved
+ * 
+ * @description Retrieves all the approved time off request data for display.
+ * 
+ * @returns {Object} 500 - Internal server error while retrieving approved time of request data.
+ * @returns {Object} 200 - Successfully retrieved all approved time off request data.
+ */
+app.get("/all-approved", authenticateToken, (req, res) => {
     const getAllApprovedTimeOffSQL = `
         SELECT
             time_off.id,
@@ -392,7 +409,7 @@ app.get("/all-time-off", authenticateToken, (req, res) => {
 
         console.log("Retrieved all approved time off");
 
-        res.json({
+        res.status(200).json({
             success: true,
             requests: results
         });
@@ -488,14 +505,14 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
 });
 
 /**
- * @route PUT /update-hours/:id
+ * @route PUT /update-hours
  * 
  * @description Updates and employee's availabel time off balance.
  * 
  * @middleware authenticateToken - Verifies the user's authentication token.
  * @middleware requireAdmin - Ensures the authenticated user has administrator privileges.
  * 
- * @param {number} id - ID of the employee who's hours are being updated.
+ * @query {number} userID - ID of the employee who's hours are being updated.
  * 
  * @body {number} sick - Updated sick hours.
  * @body {number} vacation - Updated vacation hours.
@@ -505,8 +522,8 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
  * @returns {Object} 400 - Invalid employee id or hour values.
  * @returns {Object} 500 - Internal server error while updating hours.
  */
-app.put("/update-hours/:id", authenticateToken, requireAdmin, async (req, res) => {
-    const userID = Number(req.params.id);
+app.put("/update-hours", authenticateToken, requireAdmin, async (req, res) => {
+    const userID = Number(req.query.userID);
     const { name, sick, vacation, non_work, personal } = req.body;
 
     // Validate employee ID

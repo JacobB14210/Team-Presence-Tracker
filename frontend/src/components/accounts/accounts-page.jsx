@@ -19,7 +19,7 @@ export function Accounts() {
 
                 const data = await response.json();
 
-                if (data.success) {
+                if (response.status === 200) {
                     setUsers(data.users);
                 }
                 else {
@@ -44,7 +44,7 @@ export function Accounts() {
 
     const updateHours = async (user) => { // Change the value of the hours on the database
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/update-hours/${user.id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/update-hours?userID=${user.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
