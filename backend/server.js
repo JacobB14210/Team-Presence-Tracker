@@ -440,7 +440,14 @@ app.get("/user-time-off", authenticateToken, (req, res) => {
     });
 });
 
-// Get all pending time off requests
+/**
+ * @route GET /pending
+ * 
+ * @description Gets all the time off requests that are pending.
+ * 
+ * @returns {Object} 500 - Internal server error getting pending time off requests.
+ * @returns {Obejct} 200 - Retrieved all pending time off requests.
+ */
 app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
     const getAllPendingSQL = `
         SELECT
@@ -473,7 +480,7 @@ app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
 
         console.log("Retrieved all pending time off requests")
 
-        res.json({
+        res.status(200).json({
             success: true,
             requests: results
         });
@@ -939,9 +946,23 @@ app.post("/request-off", authenticateToken, async (req, res) => {
     );
 });
 
-// Approve time off request
+/**
+ * @route POST /approve-request
+ * 
+ * @description Update status of time off request and balance of hours for the user.
+ * 
+ * @middleware authenticateToken - Verifies the user's authentication token.
+ * @middleware requireAdmin - Ensures teh authenticated user has administrator privileges.
+ * 
+ * @body {number} requestID - ID of the time off request.
+ * 
+ * @returns {Object} 500 - Error getting time off request data and changing status of time off request.
+ * @returns {Object} 404 - Error finding time off request data.
+ * @returns {Object} 400 - Eror processing time off request and user's balance.
+ * @returns {Object} 200 - successfully approved time off request.
+ */
 app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
-    const { id } = req.body;
+    const { requestID } = req.body;
 
     const getRequestHoursSQL = `
         SELECT
@@ -956,25 +977,23 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
             id = ?
     `;
 
-    db.query(getRequestHoursSQL, [id], async (err, results) => {
+    db.query(getRequestHoursSQL, [requestID], async (err, results) => {
         if (err) {
-            console.error("Error getting total hours for request");
+            console.error("Error getting time off request data");
 
             return res.status(500).json({
                 success: false,
-                message: "Error getting total hours for request"
+                message: "Error getting time off request data"
             });
         }
 
         if (results.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Could not find total hours for request"
+                message: "Time off request data does not exist"
             });
         }
 
-        console.log(results);
-        const requestID = results[0].id;
         const totalHours = results[0].total_hours;
         const reason = results[0].reason;
         const employeeID = results[0].user_id;
@@ -990,10 +1009,9 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
             const newBalanceResults = await getNewBalance(totalHours, reason, employeeID);
 
             if (newBalanceResults.success) {
-                console.log("Calculated new balance");
                 const subtractResults = await subtractHours(employeeID, newBalanceResults.balance, reason);
 
-                if (subtractResults.success) {
+                if (subtractResults.success) { // Change status of time off request to approve
                     const approveRequestSQL = `
                         UPDATE
                             time_off
@@ -1007,27 +1025,27 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
                         if (err) {
                             console.error("Error approving request:", err);
                             
-                            return res.json({
+                            return res.status(500).json({
                                 success: false,
                                 message: "Error approving request"
                             })
                         }
 
                         if (results.affectedRows === 0) {
-                            return results.json({
+                            return results.status(404).json({
                                 success: false,
-                                message: "Could not find request to approve"
+                                message: "Could not find time off request to approve"
                             });
                         }
 
-                        return res.json({
+                        return res.status(200).json({
                             success: true,
                             message: "Successfully approved time-off request"
                         });
                     });
                 }
                 else {
-                    return res.json({
+                    return res.status(500).json({
                         success: false,
                         message: subtractResults.message
                     });
@@ -1051,7 +1069,16 @@ app.post("/approve-request", authenticateToken, requireAdmin, (req, res) => {
     });
 });
 
-// Deny time off request
+/**
+ * @route POST /deny-request
+ * 
+ * @description Updates status of time off request to deny.
+ * 
+ * @body {number} id - id of time off request.
+ * 
+ * @returns {Object} 500 - Internal server error while updating status of time off request
+ * @returns {Object} 200 - Successfully change status of a time off request.
+ */
 app.post("/deny-request", authenticateToken, requireAdmin, (req, res) => {
     const { id } = req.body;
 
@@ -1075,7 +1102,7 @@ app.post("/deny-request", authenticateToken, requireAdmin, (req, res) => {
 
         console.log("Changed staus of time off request to deny");
 
-        res.json({
+        res.status(200).json({
             success: true,
             message: "Changed status of time off request to deny"
         });

@@ -6,7 +6,6 @@ import "./approve-page.css"
 export function Approve() {
     const [pendings, setPendings] = useState([]);
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
     const [message, setMessage] = useState("");
 
     // Run when browser runs
@@ -48,7 +47,7 @@ export function Approve() {
                         Authorization: `Bearer ${currentUser.token}`
                     },
                     body: JSON.stringify({
-                        id: requestId
+                        requestID: requestId
                     })
                 }
             );
@@ -60,10 +59,7 @@ export function Approve() {
             if (data.success) {
                 // Remove the approved request from the pending list
                 setPendings((currentPendings) =>
-                    currentPendings.filter(
-                        (pending) => pending.id !== requestId
-                    )
-                );
+                    currentPendings.filter((pending) => pending.id !== requestId));
 
                 setMessage(data.message);
             }
@@ -76,7 +72,7 @@ export function Approve() {
         }
     };
 
-    // Approve a time off request
+    // Deny a time off request
     const denyRequest = async (requestId) => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/deny-request`, { // Deny time off request
