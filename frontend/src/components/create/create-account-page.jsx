@@ -12,15 +12,15 @@ export function Create() {
     const [emp_type, setEmp_Type] = useState("Intern");
     const [message, setMessage] = useState("");
 
-    const handleCreateAccount = async (e) => {
+    const handleCreateAccount = async (e) => { // Adds email, name, and password information into database
         e.preventDefault();
 
-        if (!email || !password || !name) {
+        if (!email || !password || !name) { // Checks if all fields are filled in
             setMessage("Please fill out all fields.");
             return;
         }
         
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/create`, { // Create a new account for user
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/create-account`, { // Create a new account for user
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -36,7 +36,7 @@ export function Create() {
 
         const data = await response.json();
 
-        if (data.success) {
+        if (response.status === 200) {
             setEmail("");
             setName("");
             setPassword("");

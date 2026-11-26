@@ -737,8 +737,21 @@ app.post("/google-login", async (req, res) => {
     }
 });
 
-// Post new account from create account page
-app.post("/create", async (req, res) => {
+/**
+ * @route POST /create-account
+ * 
+ * @description Creates an account using email, name, password, and emp_type.
+ * 
+ * @body {String} email - Email of the new user.
+ * @body {String} name - Name of the new user.
+ * @body {String} password - Hashed password for the new user.
+ * @body {String} emp_type - Employee type of the new user
+ * 
+ * @returns {Object} 500 - Internal server error while creating the account.
+ * @returns {Object} 409 - Email entered is already being used.
+ * @returns {Object} 200 - Successfully created account.
+ */
+app.post("/create-account", async (req, res) => {
     const { email, name, password, emp_type } = req.body;
 
     const getEmailSQL = "SELECT * FROM users WHERE email = ?";
@@ -755,7 +768,7 @@ app.post("/create", async (req, res) => {
         }
 
         if (results.length > 0) {
-            return res.json({
+            return res.status(409).json({
                 success: false,
                 message: "Email is already used"
             });
@@ -782,7 +795,7 @@ app.post("/create", async (req, res) => {
 
             console.log("Created new user");
 
-            return res.json({
+            return res.status(200).json({
                 success: true,
                 message: "Successfully created account"
             });

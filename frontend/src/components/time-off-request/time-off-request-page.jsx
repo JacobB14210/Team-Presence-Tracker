@@ -4,6 +4,8 @@ import { Dashboard } from "../component-index";
 import "./time-off-request-page.css"
 
 export function Time() {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    
     const [startDate, setStart] = useState("");
     const [endDate, setEnd] = useState("");
     const [reason, setReason] = useState("");
@@ -22,8 +24,6 @@ export function Time() {
     const [history, setHistory] = useState([]);
 
     const [message, setMessage] = useState("");
-
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
     useEffect(() => {
         const handleHoursBalance = async () => {

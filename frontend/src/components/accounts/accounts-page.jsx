@@ -4,8 +4,8 @@ import { Dashboard } from "../component-index";
 import "./accounts-page.css"
 
 export function Accounts() {
-    const [users, setUsers] = useState([]); // List of all users in the databases
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    const [users, setUsers] = useState([]); // List of all users in the databases
     const [message, setMessage] = useState([]);
 
     useEffect(() => {

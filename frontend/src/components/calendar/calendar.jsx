@@ -6,10 +6,10 @@ import { useState, useEffect } from "react";
 import "./calendar.css"
 
 export function Calendar() {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     const [date, setDate] = useState(today(getLocalTimeZone()));
     const [requests, setRequests] = useState([]);
     const [approvedRequests, setApprovedRequests] = useState([]);
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
     useEffect(() => {
         const getAllRequests = async () => {
