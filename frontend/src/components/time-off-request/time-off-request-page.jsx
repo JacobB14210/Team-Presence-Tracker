@@ -214,8 +214,8 @@ export function Time() {
                             <option value="" disabled>Select an option</option>
                             <option value="Sick">Sick</option>
                             <option value="Vacation">Vacation</option>
-                            <option value="Personal">Personal</option>
                             <option value="Non_work">Non-work</option>
+                            <option value="Personal">Personal</option>
                         </select>
                     </div>
 
