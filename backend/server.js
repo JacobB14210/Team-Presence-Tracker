@@ -71,7 +71,12 @@ cron.schedule("0 7 * * 1-5", async () => {
     await sendDailyEmail(emailResults, text);
 });
 
-// Sends the daily email
+/**
+ * @description Uses transporter to send an email of the list of employee's in the office.
+ * 
+ * @param {String[]} emails - list of emails to send to.
+ * @param {String} text - Text for the body of the email.
+ */
 async function sendDailyEmail(emails, text) {
     try {
         await transporter.sendMail({ // Send the daily email
@@ -88,7 +93,14 @@ async function sendDailyEmail(emails, text) {
     }
 }
 
-// Build text of the email
+/**
+ * @description Builds the text for the body of the email.
+ * 
+ * @param {String[]} timeOffResults - List of employees with approved time off request.
+ * @param {Date} today - The day the email is sent.
+ * 
+ * @returns {String} - Text for the email.
+ */
 function buildEmailText(timeOffResults, today) {
     let text = "Approved Time Off\n";
 
@@ -123,7 +135,11 @@ function buildEmailText(timeOffResults, today) {
 
 }
 
-// Get all the emails to send daily notification to
+/**
+ * @description Runs an SQL query to get all the emails in the database.
+ * 
+ * @returns {Object[]} - All emails from the databse to send the daily email to.
+ */
 async function getAllEmails() {
     const getAllEmailsSQL = "SELECT email FROM users";
 
@@ -144,7 +160,13 @@ async function getAllEmails() {
     });
 }
 
-// Get all the approved time off for the date
+/**
+ * @description Helper function to get all the approved time off request.
+ * 
+ * @param {Date} date - Date for daily email.
+ * 
+ * @returns {Object[]} - All approved time off requests for the day. 
+ */
 async function getAllApproved(date) {
     const getAllApprovedSQL = `
         SELECT
@@ -179,7 +201,11 @@ async function getAllApproved(date) {
     });
 }
 
-// Function to authenticate a user
+/**
+ * @description Checks if the user is authenticated to use the application.
+ * 
+ * @returns {Boolean} - If the current user is authenticated for the application.
+ */
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
 
@@ -216,7 +242,11 @@ function authenticateToken(req, res, next) {
     )
 }
 
-// Function to authenticate the Admin role
+/**
+ * @description Checks if the user is an admin.
+ * 
+ * @returns {Boolean} - If the current user is an admin for the application.
+ */
 function requireAdmin(req, res, next) {
     if (req.user.role !== "Admin") { // Check if user has admin role
         console.log("Admin access required");
@@ -230,6 +260,131 @@ function requireAdmin(req, res, next) {
     console.log("Authenticated Admin")
 
     next();
+}
+
+/**
+ * @description Checks if the user has enough hours to create a time off request.
+ * 
+ * @param {Number} hoursToSubtract - Hours that subtract from the user's balance.
+ * @param {String} reason - The reason balance the hours will subtract from.
+ * @param {Number} userID - The ID of the user to subtract hours from.
+ * 
+ * @returns {Boolean} - If the user has enough hours for the time off request.
+ */
+async function checkEnoughHours(hoursToSubtract, reason, userID) {
+    // Get the balance for this specific user
+    const getUserHoursSQL = `
+        SELECT
+            ${reason}
+                AS
+                    availableHours
+        FROM
+            users
+        WHERE
+            id = ?
+    `;
+
+    return new Promise((resolve, reject) => {
+        db.query(getUserHoursSQL, [userID], (err, results) => {
+            if (err) {
+                console.error("Error getting user hours:", err);
+
+                return reject(err);
+            }
+
+            if (results.length === 0) {
+                return resolve({
+                    success: false,
+                    message: "User's hours not found"
+                });
+            }
+
+            const availableHours = results[0].availableHours;
+
+            // Check whether the user has enough hours
+            if (availableHours < hoursToSubtract) {
+                return resolve({
+                    success: false,
+                    message: "Not enough hours available"
+                });
+            }
+
+            return resolve({
+                success: true,
+                availableHours: availableHours
+            });
+        });
+
+    });
+}
+
+/**
+ * @description Gets the new hours balance for a user to update hours for a reason.
+ * 
+ * @param {Number} hoursToSubtract - Hours to subtract from the total hours.
+ * @param {String} reason - Reason to subtract hours from.
+ * @param {Number} userID - ID of the user to subtract hours from.
+ * 
+ * @returns {Number} - Updated value for the total hours of a user and the reason.
+ */
+async function getNewBalance(hoursToSubtract, reason, userID) {
+    const checkResults = await checkEnoughHours(hoursToSubtract, reason, userID);
+
+    if (!checkResults.success) {
+        return {
+            success: false,
+            message: checkResults.message
+        };
+    }
+
+    const availableHours = checkResults.availableHours;
+    const newBalance = availableHours - hoursToSubtract;
+
+    return {
+        success: true,
+        balance: newBalance
+    };
+}
+
+/**
+ * @description Subtract the hours of a reason for an employee
+ * 
+ * @param {Number} userID - ID of the user to subtract hours from.
+ * @param {Number} newBalance - The new balance to update the hours to.
+ * @param {String} reason - The reason to update the hours balance for.
+ * 
+ * @returns {Boolean} - If subtracting the hours was successfull. 
+ */
+async function subtractHours(userID, newBalance, reason) {
+    const updateBalanceSQL = `
+        UPDATE
+            users
+        SET
+            ${reason} = ?
+        WHERE
+            id = ?
+    `;
+
+    return new Promise((resolve, reject) => {
+        db.query(updateBalanceSQL, [newBalance, userID], (err, results) => {
+            if (err) {
+                console.error("Error updating hours:", err);
+                return reject(err);
+            }
+
+            if (results.affectedRows === 0) {
+                return resolve({
+                    success: false,
+                    message: "Could not find user to update"
+                });
+            }
+
+            return resolve({
+                success: true,
+                message: "Successfully subtracted hours from user"
+            });
+        });
+    });
 }
 
 /**
@@ -479,7 +634,7 @@ app.get("/request-history", authenticateToken, (req, res) => {
  * @description Gets all the time off requests that are pending.
  * 
  * @returns {Object} 500 - Internal server error getting pending time off requests.
- * @returns {Obejct} 200 - Retrieved all pending time off requests.
+ * @returns {Object} 200 - Retrieved all pending time off requests.
  */
 app.get("/pending", authenticateToken, requireAdmin, (req, res) => {
     const getAllPendingSQL = `
@@ -818,104 +973,6 @@ app.post("/create-account", async (req, res) => {
         })
     });
 });
-
-async function checkEnoughHours(hoursToSubtract, reason, userID) {
-    // Get the balance for this specific user
-    const getUserHoursSQL = `
-        SELECT
-            ${reason}
-                AS
-                    availableHours
-        FROM
-            users
-        WHERE
-            id = ?
-    `;
-
-    return new Promise((resolve, reject) => {
-        db.query(getUserHoursSQL, [userID], (err, results) => {
-            if (err) {
-                console.error("Error getting user hours:", err);
-
-                return reject(err);
-            }
-
-            if (results.length === 0) {
-                return resolve({
-                    success: false,
-                    message: "User's hours not found"
-                });
-            }
-
-            const availableHours = results[0].availableHours;
-
-            // Check whether the user has enough hours
-            if (availableHours < hoursToSubtract) {
-                return resolve({
-                    success: false,
-                    message: "Not enough hours available"
-                });
-            }
-
-            return resolve({
-                success: true,
-                availableHours: availableHours
-            });
-        });
-
-    });
-}
-
-async function getNewBalance(hoursToSubtract, reason, userID) {
-    const checkResults = await checkEnoughHours(hoursToSubtract, reason, userID);
-
-    if (!checkResults.success) {
-        return {
-            success: false,
-            message: checkResults.message
-        };
-    }
-
-    const availableHours = checkResults.availableHours;
-    const newBalance = availableHours - hoursToSubtract;
-
-    return {
-        success: true,
-        balance: newBalance
-    };
-}
-
-async function subtractHours(userID, newBalance, reason) {
-    const updateBalanceSQL = `
-        UPDATE
-            users
-        SET
-            ${reason} = ?
-        WHERE
-            id = ?
-    `;
-
-    return new Promise((resolve, reject) => {
-        db.query(updateBalanceSQL, [newBalance, userID], (err, results) => {
-            if (err) {
-                console.error("Error updating hours:", err);
-                return reject(err);
-            }
-
-            if (results.affectedRows === 0) {
-                return resolve({
-                    success: false,
-                    message: "Could not find user to update"
-                });
-            }
-
-            return resolve({
-                success: true,
-                message: "Successfully subtracted hours from user"
-            });
-        });
-    });
-}
 
 /**
  * @route POST /request-off
