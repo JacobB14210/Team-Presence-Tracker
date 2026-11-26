@@ -63,7 +63,7 @@ const transporter = nodemailer.createTransport({
 
 // Schedule sendDailyEmails function every 7 am, mon - fri
 cron.schedule("0 7 * * 1-5", async () => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA");
     const timeOffResults = await getAllApproved(today); // Get all user's time off for today
     const text = buildEmailText(timeOffResults, today); // Format text of email
     const emailResults = await getAllEmails(); // Get all emails in the database to send daily email to
@@ -102,7 +102,7 @@ async function sendDailyEmail(emails, text) {
  * @returns {String} - Text for the email.
  */
 function buildEmailText(timeOffResults, today) {
-    let text = "Approved Time Off\n";
+    let text = `Approved Time Off For: ${today}\n`;
 
     if (timeOffResults.length === 0) {
         return "No approved time off"
@@ -120,11 +120,11 @@ function buildEmailText(timeOffResults, today) {
             .split("T")[0];
 
         if (request.leave_early && startDate === today) {
-            text += `, Leave early: ${request.leave_time}`;
+            text += `, leaves early at ${request.leave_time.slice(0, 5)}`;
         }
 
         if (request.return_late && endDate === today) {
-            text += `, Return late: ${request.return_time}`;
+            text += `, returns late at ${request.return_time.slice(0, 5)}`;
         }
 
         text += "\n";
