@@ -11,7 +11,10 @@ export function Dashboard() {
     const handleSignOut = async (e) => {
         e.preventDefault();
 
+        // Remove user from local storage
         localStorage.removeItem("currentUser");
+
+        // Go back to login page
         window.location.href = "/"
     }
 
@@ -20,7 +23,7 @@ export function Dashboard() {
             <img src={logo} alt="BPUSD-logo" />
             
             <div className="dashboard-buttons">
-                {currentUser?.role === "Admin" && (
+                {currentUser?.role === "Admin" && ( /* Checks if user is admin */
                     <div className="admin-buttons">
                         <button
                             type="button"
