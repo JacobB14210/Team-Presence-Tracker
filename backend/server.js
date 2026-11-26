@@ -232,8 +232,16 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-// Get a user's hours
-app.get("/user-hours", authenticateToken, (req, res) => {
+/**
+ * @route GET /user-balance
+ * 
+ * @description Retrieves the user's hours balance.
+ * 
+ * @returns {Object} 500 - Internal server error getting hours balance for user.
+ * @returns {Object} 404 - User does not exist in the database.
+ * @returns {Object} 200 - Successfully retrieves a user's balance.
+ */
+app.get("/user-balance", authenticateToken, (req, res) => {
     const userID = req.user.id
 
     const getUserHoursSQL = `
@@ -260,6 +268,7 @@ app.get("/user-hours", authenticateToken, (req, res) => {
 
         if (results.length === 0) {
             console.log("User not found");
+
             return res.status(404).json({
                 success: false,
                 message: "User not found"
@@ -268,7 +277,7 @@ app.get("/user-hours", authenticateToken, (req, res) => {
 
         console.log("Retreived user's hours");
 
-        res.json({
+        res.status(200).json({
             success: true,
             hours: results[0]
         });
@@ -324,7 +333,7 @@ app.get("/all-users", authenticateToken, requireAdmin, (req, res) => {
  * 
  * @description Retrieves all time off request information for selected date.
  * 
- * @query {date} date - Selected date to get time off request data.
+ * @query {Date} date - Selected date to get time off request data.
  * 
  * @returns {Object} 500 - Internal server error getting approved time off for selected date.
  * @returns {Object} 200 - Successfully retrieved all approved time off request for selected date.
@@ -416,8 +425,15 @@ app.get("/all-approved", authenticateToken, (req, res) => {
     });
 });
 
-// Get all time off requests for a user
-app.get("/user-time-off", authenticateToken, (req, res) => {
+/**
+ * @route GET /request-history
+ * 
+ * @description Retrieves history of time off requests for the user.
+ * 
+ * @returns {Object} 500 - Internal server error retrieving history of time off requests for the user.
+ * @returns {Object} 200 - Successfully retrieved history of time off requests for the user.
+ */
+app.get("/request-history", authenticateToken, (req, res) => {
     const userID = req.user.id
 
     const getAllUsersTimeOff =`
@@ -450,7 +466,7 @@ app.get("/user-time-off", authenticateToken, (req, res) => {
 
         console.log("Retrieved all approved time off");
 
-        res.json({
+        res.status(200).json({
             success: true,
             requests: results
         });
@@ -901,7 +917,24 @@ async function subtractHours(userID, newBalance, reason) {
     });
 }
 
-// Post time off request from time off request page
+/**
+ * @route POST /request-off
+ * 
+ * @description Creates a new time off request.
+ * 
+ * @body {Date} startDate - Start date of the time off request.
+ * @body {Date} endDate - End date of the time off request.
+ * @body {String} reason - Reasons for the time off request.
+ * @body {Boolean} leaveEarly - If employee wants to leave early.
+ * @body {Boolean} returnLate - If employee wants to return late.
+ * @body {Time} leaveTime - Time the emplyee will leave early.
+ * @body {Time} returnLate - Time the employee will return late.
+ * @body {number} usedHours - Amount of hours used for the time off request.
+ * 
+ * @returns {Object} 500 - Internal server error while creating the request.
+ * @returns {Object} 400 - Insufficient hours or invalid request data.
+ * @returns {Object} 201 - Time off request successfully created.
+ */
 app.post("/request-off", authenticateToken, async (req, res) => {
     const userID = req.user.id;
     const { startDate, endDate, reason, leaveEarly, returnLate, leaveTime, returnTime, usedHours } = req.body;
@@ -909,7 +942,7 @@ app.post("/request-off", authenticateToken, async (req, res) => {
     const checkResults = await checkEnoughHours(usedHours, reason, userID);
 
     if (!checkResults.success) {
-        return res.json({
+        return res.status(400).json({
             success: false,
             message: "You don't have enough hours"
         });
@@ -922,7 +955,7 @@ app.post("/request-off", authenticateToken, async (req, res) => {
         const newBalanceResults = await getNewBalance(usedHours, reason, userID);
 
         if (!newBalanceResults.success) {
-            return res.json({
+            return res.status(400).json({
                 success: false,
                 message: newBalanceResults.message
             });
@@ -954,13 +987,13 @@ app.post("/request-off", authenticateToken, async (req, res) => {
                 const subtractResults = await subtractHours(userID, newBalance, reason);
 
                 if (!subtractResults.success) {
-                    return res.json({
+                    return res.status(500).json({
                         success: false,
                         message: subtractResults.message
                     });
                 }
 
-                return res.json({
+                return res.status(200).json({
                     success: true,
                     message: "Sick request approved and hours subtracted"
                 });
@@ -968,7 +1001,7 @@ app.post("/request-off", authenticateToken, async (req, res) => {
 
             console.log("Created a new time off request");
 
-            return res.json({
+            return res.status(200).json({
                 success: true,
                 message: "Time off request submitted"
             });

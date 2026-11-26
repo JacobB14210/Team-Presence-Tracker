@@ -28,7 +28,7 @@ export function Time() {
     useEffect(() => {
         const handleHoursBalance = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/user-hours`, { // Get hours for a user
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/user-balance`, { // Get hours for a user
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -38,8 +38,8 @@ export function Time() {
 
                 const data = await response.json();
 
-                if (!data.success) {
-                    console.log(data.message);
+                if (!response.status === 200) {
+                    setMessage(data.message);
                 }
 
                 setSickHours(data.hours.sick ?? 0);
@@ -48,7 +48,7 @@ export function Time() {
                 setPersonalHours(data.hours.personal ?? 0);
             }
             catch (error) {
-                console.error("Error getting total hours balance for user: ", error);
+                setMessage("Error getting total hours balance for user: ", error);
 
                 setSickHours(0);
                 setVacationHours(0);
@@ -59,7 +59,7 @@ export function Time() {
 
         const handleRequestHistory = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/user-time-off`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/request-history`, { // Get request history for the user
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export function Time() {
 
                 const data = await response.json();
 
-                if (data.success) {
+                if (response.status === 200) {
                     setHistory(data.requests);
                 }
                 else {
@@ -136,8 +136,7 @@ export function Time() {
 
         const data = await response.json();
 
-        if (data.success) {
-            setMessage(data.message);
+        if (response.status === 200) {
             setStart("");
             setEnd("");
             setReason("");
